@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}">
+
+    <script src="../../static/js/jquery-3.3.1.min.js" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script src="../../static/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+    <title>用户登录</title>
+
+    <style>
+        .bgColor{
+            background-color:rgba(243,66,111,0.15)
+        }
+        .divBorder{
+            border: solid 1px rgba(12,24,255,0.15);
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .h4font{
+            margin-top: 0px;
+            font-family: 微软雅黑;
+            font-weight: 500;
+        }
+
+        .center {
+           padding: 20% 0;
+        }
+        .verifyInput{
+            vertical-align:middle;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 1;
+            /*border:1px solid #999;*/
+            float: left;
+            width:180px;
+            height:30px;
+
+        }
+        .verifyImage{
+            vertical-align:middle;
+            float: right;
+            height: 30px;
+        }
+
+    </style>
+
+
+</head>
+<body>
+
+<div class="container">
+    <div class="row center">
+        <div class="divBorder col-sm-offset-4 col-sm-4">
+            <h3 class="panel panel-heading h4font">
+                用户登录
+            </h3>
+            <h4 th:text="${msg}"></h4>
+            <form class="form-horizontal" th:action="@{/login}" method="post">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-user" aria-hidden="true"></i></span>
+                    <input type="text" class="form-control" name="userName" placeholder="请输入用户名称" th:value="${userName}"/>
+                </div>
+                <br>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                    <input type="password" class="form-control" name="password" th:value="${password}" placeholder="请输入密码"/>
+                </div>
+                <br/>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-font"></i></span>
+                    <input type="text"class="verifyInput" name="verifyCode" placeholder="验证码"/>
+                    <img class="verifyImage"  alt="验证码" onclick="this.src='/getVerifyCode?d='+new Date()*1" src="/getVerifyCode">
+                </div>
+
+                <br>
+                <input type="submit" class="btn btn-lg btn-block btn-info" value="登 录">
+            </form>
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+
+</body>
+</html>

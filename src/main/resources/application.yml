@@ -1,0 +1,30 @@
+server:
+  servlet:
+    context-path: /
+  port: 80
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/busData?characterEncoding=utf8&useSSL=false
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #按字段名字建表
+    show-sql: false
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+  thymeleaf:
+    cache: false
+
+  messages:
+    basename: myconfig
+
+
+
+
+
