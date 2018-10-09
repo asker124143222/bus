@@ -34,7 +34,7 @@ public class HomeController {
 
     @RequestMapping({"/", "/index"})
     public String index() {
-        return "/index";
+        return "index";
     }
 
 
@@ -80,13 +80,13 @@ public class HomeController {
     @RequestMapping("/403")
     public String unauthorizedRole() {
         System.out.println("------没有权限-------");
-        return "/user/403";
+        return "user/403";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String toLogin(Map<String, Object> map, HttpServletRequest request) {
         loginService.logout();
-        return "/user/login";
+        return "user/login";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -103,39 +103,37 @@ public class HomeController {
             map.put("msg", "请刷新图片，输入验证码！");
             map.put("userName", userName);
             map.put("password", password);
-            return "/user/login";
+            return "user/login";
         }
         Long expiredTime = (currentMillis - verifyCodeTTL) / 1000;
         if (expiredTime > this.verifyTTL) {
             map.put("msg", "验证码过期，请刷新图片重新输入！");
             map.put("userName", userName);
             map.put("password", password);
-            return "/user/login";
+            return "user/login";
         }
 
         if (!verifyCode.equalsIgnoreCase(rightCode)) {
             map.put("msg", "验证码错误，请刷新图片重新输入！");
             map.put("userName", userName);
             map.put("password", password);
-            return "/user/login";
+            return "user/login";
         }
 
         LoginResult loginResult = loginService.login(userName, password);
         if (loginResult.isLogin()) {
             map.put("userName", userName);
-            return "/index";
+            return "index";
         } else {
             map.put("msg", loginResult.getResult());
             map.put("userName", userName);
-            return "/user/login";
+            return "user/login";
         }
     }
 
     @RequestMapping("/logout")
     public String logOut(HttpSession session) {
         loginService.logout();
-        return "/user/login";
+        return "user/login";
     }
-
-
 }

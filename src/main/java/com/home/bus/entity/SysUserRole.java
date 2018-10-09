@@ -9,7 +9,7 @@ import javax.persistence.Id;
 /**
  * @Author: xu.dm
  * @Date: 2018/9/24 15:47
- * @Description:
+ * @Description:用户和角色关联表
  */
 
 @Entity

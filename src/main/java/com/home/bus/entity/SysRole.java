@@ -29,10 +29,10 @@ public class SysRole {
     private String description; // 角色描述,UI界面显示使用
     private Boolean available = Boolean.FALSE; // 是否可用,如果不可用将不会添加给用户，
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm",timezone="GMT+8")
+//    @JsonFormat(pattern="yyyy-MM-dd HH:mm",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createTime;//创建时间
-    @JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
+//    @JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate expiredDate;//过期日期
 

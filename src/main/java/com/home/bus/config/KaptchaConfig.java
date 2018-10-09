@@ -50,5 +50,4 @@ public class KaptchaConfig {
 
         return defaultKaptcha;
     }
-
 }

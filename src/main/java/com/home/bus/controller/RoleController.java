@@ -1,8 +1,5 @@
 package com.home.bus.controller;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.home.bus.entity.SysRole;
 import com.home.bus.model.ISysRolePermission;
 import com.home.bus.service.RoleService;
@@ -19,7 +16,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +33,6 @@ public class RoleController {
     @Resource
     RoleService roleService;
 
-    //,produces="application/json;charset=UTF-8"
     @RequestMapping(value="/role")
     @ResponseBody
     @RequiresPermissions("role:view")
@@ -97,7 +92,7 @@ public class RoleController {
 //    @RequiresPermissions("user:view")
     public String list()
     {
-        return "/user/roleList";
+        return "user/roleList";
     }
 
 
@@ -105,7 +100,7 @@ public class RoleController {
     @RequiresPermissions("role:add")
     public String toAdd(SysRole sysRole) {
 //        sysRole.setAvailable(false);
-        return "/user/roleAdd";
+        return "user/roleAdd";
     }
 
     @RequestMapping(value="/roleAdd",method = RequestMethod.POST)
@@ -121,7 +116,7 @@ public class RoleController {
             sysRole.setCreateTime(LocalDateTime.now());
         try {
             roleService.save(sysRole);
-            return  "/user/rlist";
+            return  "user/rlist";
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -155,9 +150,9 @@ public class RoleController {
     {
         SysRole sysRole = roleService.findById(id).orElse(new SysRole());
         map.put("sysRole",sysRole);
-        return "/user/roleAdd";
+        return "user/roleAdd";
     }
-    
+
     @RequestMapping(value = "/roleDelete")
     @ResponseBody
     @RequiresPermissions("role:del")
@@ -197,34 +192,22 @@ public class RoleController {
     {
         SysRole sysRole = roleService.findById(roleId).orElse(new SysRole());
         map.put("sysRole",sysRole);
-        return "/user/sysPermission";
+        return "user/sysPermission";
     }
 
     @RequestMapping("/getPermission/{roleId}")
     @ResponseBody
     @RequiresPermissions("role:authorize")
-    public Object getRolePermission(@PathVariable("roleId")Integer roleId, Map<String, Object> map)
+    public Object getRolePermission(@PathVariable("roleId")Integer roleId)
     {
         if(roleId==null)
             return null;
 
         List<ISysRolePermission> list = roleService.findSysRolePermissionByRoleId(roleId);
-        ObjectMapper mapper=new ObjectMapper();
-        String jsonString="";
-        try {
-            jsonString=mapper.writeValueAsString(list);
-//            System.out.print(jsonString);
-        } catch (JsonGenerationException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return jsonString;
+        return list;
     }
 
+    //根据roleid授权
     @RequestMapping(value = "/toAuthorize")
     @ResponseBody
     @RequiresPermissions("role:authorize")

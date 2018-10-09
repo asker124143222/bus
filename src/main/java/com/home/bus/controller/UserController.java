@@ -106,7 +106,7 @@ public class UserController {
     @RequestMapping(value = "/add",method = RequestMethod.GET)
     @RequiresPermissions("user:add")//权限管理;
     public String toUserAdd(User user){
-        return "/user/userAdd";
+        return "user/userAdd";
     }
 
 
@@ -126,7 +126,6 @@ public class UserController {
         user.setSalt(this.salt);
         if(user.getUserId()==null) {
             user.setCreateTime(LocalDateTime.now());
-//            String encryptPwd = new EncryptUtils(user.getCredentialsSalt(), this.algorithmName, this.hashIterations).encrypt(user.getPassword());
             String encryptPwd = EncryptUtils.encrypt(user.getPassword(),user.getCredentialsSalt(),this.algorithmName,this.hashIterations);
             user.setPassword(encryptPwd);
         }
@@ -134,13 +133,12 @@ public class UserController {
             if(!user.getPassword().equals(password2))
             {
                 String encryptPwd = EncryptUtils.encrypt(user.getPassword(),user.getCredentialsSalt(),this.algorithmName,this.hashIterations);
-//                String encryptPwd = new EncryptUtils(user.getCredentialsSalt(), this.algorithmName, this.hashIterations).encrypt(user.getPassword());
                 user.setPassword(encryptPwd);
             }
         }
         try {
             userService.save(user);
-            return "/user/ulist";
+            return "user/ulist";
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -173,7 +171,7 @@ public class UserController {
     {
         User user = userService.findUserById(id).orElse(new User());
         map.put("user",user);
-        return "/user/userAdd";
+        return "user/userAdd";
     }
 
     /**
@@ -201,7 +199,7 @@ public class UserController {
         try {
             userService.deleteAllUserByUserIdList(idList);
             map.put("success","true");
-            map.put("url","/user/ulist");
+            map.put("url","user/ulist");
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -217,7 +215,7 @@ public class UserController {
     {
         User user = userService.findUserById(userId).orElse(new User());
         map.put("user",user);
-        return "/user/userRole";
+        return "user/userRole";
     }
 
 
@@ -232,21 +230,6 @@ public class UserController {
         List<IUserRole> list = userService.findAllUserRoleByUserId(userId);
 
         return list;
-
-//        ObjectMapper mapper=new ObjectMapper();
-//        String jsonString="";
-//        try {
-//            jsonString=mapper.writeValueAsString(list);
-////            System.out.print(jsonString);
-//        } catch (JsonGenerationException e) {
-//            e.printStackTrace();
-//        } catch (JsonMappingException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return jsonString;
     }
 
 

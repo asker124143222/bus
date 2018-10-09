@@ -24,7 +24,7 @@ public class LogAspect {
 
     private Logger logger = LoggerFactory.getLogger(LogAspect.class);
 
-    @Pointcut("execution(public * com.home.crm.controller.*.*(..))")
+    @Pointcut("execution(public * com.home.bus.controller.*.*(..))")
     public void log()
     {
     }
@@ -39,7 +39,7 @@ public class LogAspect {
         logger.info("ip:{}",request.getRemoteAddr());
         logger.info("method:{}",request.getMethod());
         logger.info("class_method:{}",joinPoint.getSignature().getDeclaringTypeName()+"."+joinPoint.getSignature().getName());
-        logger.info("args:{}", Arrays.toString(joinPoint.getArgs()));
+        logger.info("args:{}", joinPoint.getArgs());
     }
 
     @After("log()")
@@ -55,10 +55,7 @@ public class LogAspect {
     @AfterReturning(pointcut = "log()",returning = "result")
     public void doAfterReturning(Object result)
     {
-        if(result!=null)
-            logger.info("方法返回hashcode：{}",result.hashCode());
-        else
-            logger.info("方法返回hashcode：{}","null");
+        logger.info("方法返回hashcode：{}",result);
     }
 
 }
