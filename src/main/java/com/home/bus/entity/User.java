@@ -22,7 +22,7 @@ public class User {
     @GenericGenerator(name="generator",strategy = "native")
     @GeneratedValue(generator = "generator")
     private Integer userId;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true,length = 60)
     private String userName; //登录用户名，账号
     @Column(nullable = false)
     private String name;//名称（昵称或者真实姓名，根据实际情况定义）

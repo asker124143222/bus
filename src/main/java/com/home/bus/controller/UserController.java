@@ -3,6 +3,7 @@ package com.home.bus.controller;
 
 import com.home.bus.entity.User;
 import com.home.bus.model.IUserRole;
+import com.home.bus.service.LogService;
 import com.home.bus.service.LoginService;
 import com.home.bus.service.UserService;
 import com.home.bus.utils.EncryptUtils;
@@ -41,6 +42,8 @@ public class UserController {
     UserService userService;
     @Resource
     LoginService loginService;
+    @Resource
+    LogService logService;
     /**
      * 用户查询.
      * @return
@@ -106,7 +109,7 @@ public class UserController {
     @RequestMapping(value = "/add",method = RequestMethod.GET)
     @RequiresPermissions("user:add")//权限管理;
     public String toUserAdd(User user){
-        return "user/userAdd";
+        return "/user/userAdd";
     }
 
 
@@ -138,7 +141,8 @@ public class UserController {
         }
         try {
             userService.save(user);
-            return "user/ulist";
+            logService.writeLog("新增或修改用户","用户："+user.getUserName());
+            return "/user/ulist";
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -171,7 +175,7 @@ public class UserController {
     {
         User user = userService.findUserById(id).orElse(new User());
         map.put("user",user);
-        return "user/userAdd";
+        return "/user/userAdd";
     }
 
     /**
@@ -199,7 +203,8 @@ public class UserController {
         try {
             userService.deleteAllUserByUserIdList(idList);
             map.put("success","true");
-            map.put("url","user/ulist");
+            map.put("url","/user/ulist");
+            logService.writeLog("删除用户","用户id："+userIdList);
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -215,21 +220,35 @@ public class UserController {
     {
         User user = userService.findUserById(userId).orElse(new User());
         map.put("user",user);
-        return "user/userRole";
+        return "/user/userRole";
     }
 
 
     @RequestMapping(value = "/toGetUserRole/{userId}")
-    @RequiresPermissions("user:roleGrant")
     @ResponseBody
+    @RequiresPermissions("user:roleGrant")
     public Object getUserRole(@PathVariable("userId")Integer userId)
     {
         if(userId==null)
             return null;
 
         List<IUserRole> list = userService.findAllUserRoleByUserId(userId);
-
         return list;
+
+//        ObjectMapper mapper=new ObjectMapper();
+//        String jsonString="";
+//        try {
+//            jsonString=mapper.writeValueAsString(list);
+////            System.out.print(jsonString);
+//        } catch (JsonGenerationException e) {
+//            e.printStackTrace();
+//        } catch (JsonMappingException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return jsonString;
     }
 
 
@@ -248,6 +267,7 @@ public class UserController {
                 userService.deleteAllUserRoleByUserId(userId);
                 map.put("success","true");
                 map.put("url","/user/ulist");
+                logService.writeLog("角色清除","用户ID："+userId);
                 return map;
             }catch (Exception e)
             {
@@ -268,6 +288,7 @@ public class UserController {
             userService.grantUserRole(userId,idList);
             map.put("sucess","true");
             map.put("url","/user/ulist");
+            logService.writeLog("角色分配","用户ID："+userId+" 角色id列表："+roleIdList);
 
             return map;
         }catch (Exception e)
@@ -339,12 +360,13 @@ public class UserController {
             return map;
         }
 
-        String encryptNewPwd = EncryptUtils.encrypt(newPassword,user.getCredentialsSalt(),this.algorithmName,this.hashIterations);
+        String encryptNewPwd =EncryptUtils.encrypt(newPassword,user.getCredentialsSalt(),this.algorithmName,this.hashIterations);
         user.setPassword(encryptNewPwd);
         userService.save(user);
         map.put("success","true");
         map.put("result","密码修改成功，请重新登录");
         map.put("url","/logout");
+        logService.writeLog("修改密码","成功");
         return map;
     }
 

@@ -2,6 +2,7 @@ package com.home.bus.controller;
 
 import com.home.bus.entity.SysRole;
 import com.home.bus.model.ISysRolePermission;
+import com.home.bus.service.LogService;
 import com.home.bus.service.RoleService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,10 @@ import java.util.Map;
 public class RoleController {
     @Resource
     RoleService roleService;
+    @Resource
+    LogService logService;
 
+    //,produces="application/json;charset=UTF-8"
     @RequestMapping(value="/role")
     @ResponseBody
     @RequiresPermissions("role:view")
@@ -92,7 +96,7 @@ public class RoleController {
 //    @RequiresPermissions("user:view")
     public String list()
     {
-        return "user/roleList";
+        return "/user/roleList";
     }
 
 
@@ -100,7 +104,7 @@ public class RoleController {
     @RequiresPermissions("role:add")
     public String toAdd(SysRole sysRole) {
 //        sysRole.setAvailable(false);
-        return "user/roleAdd";
+        return "/user/roleAdd";
     }
 
     @RequestMapping(value="/roleAdd",method = RequestMethod.POST)
@@ -112,11 +116,12 @@ public class RoleController {
         {
             return "0";
         }
-        if(sysRole.getCreateTime()==null)
+        if(sysRole.getRoleId()==null)
             sysRole.setCreateTime(LocalDateTime.now());
         try {
             roleService.save(sysRole);
-            return  "user/rlist";
+            logService.writeLog("操作角色（新增或修改）","角色："+sysRole.getRole());
+            return  "/user/rlist";
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -150,9 +155,9 @@ public class RoleController {
     {
         SysRole sysRole = roleService.findById(id).orElse(new SysRole());
         map.put("sysRole",sysRole);
-        return "user/roleAdd";
+        return "/user/roleAdd";
     }
-
+    
     @RequestMapping(value = "/roleDelete")
     @ResponseBody
     @RequiresPermissions("role:del")
@@ -177,6 +182,7 @@ public class RoleController {
         {
             map.put("success","true");
             map.put("url","/user/rlist");
+            logService.writeLog("删除角色","角色id："+roleIdList);
         }
         else
         {
@@ -192,7 +198,7 @@ public class RoleController {
     {
         SysRole sysRole = roleService.findById(roleId).orElse(new SysRole());
         map.put("sysRole",sysRole);
-        return "user/sysPermission";
+        return "/user/sysPermission";
     }
 
     @RequestMapping("/getPermission/{roleId}")
@@ -205,9 +211,22 @@ public class RoleController {
 
         List<ISysRolePermission> list = roleService.findSysRolePermissionByRoleId(roleId);
         return list;
+//        ObjectMapper mapper=new ObjectMapper();
+//        String jsonString="";
+//        try {
+//            jsonString=mapper.writeValueAsString(list);
+////            System.out.print(jsonString);
+//        } catch (JsonGenerationException e) {
+//            e.printStackTrace();
+//        } catch (JsonMappingException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return jsonString;
     }
 
-    //根据roleid授权
     @RequestMapping(value = "/toAuthorize")
     @ResponseBody
     @RequiresPermissions("role:authorize")
@@ -221,6 +240,7 @@ public class RoleController {
                 roleService.clearAuthorization(roleId);
                 map.put("success","true");
                 map.put("url","/user/rlist");
+                logService.writeLog("清除角色权限","成功");
                 return map;
             }catch (Exception e)
             {
@@ -241,7 +261,7 @@ public class RoleController {
             roleService.grantAuthorization(roleId,idList);
             map.put("sucess","true");
             map.put("url","/user/rlist");
-
+            logService.writeLog("角色授权","权限列表："+permissionIdList);
             return map;
         }catch (Exception e)
         {
