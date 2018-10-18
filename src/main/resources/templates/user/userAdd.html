@@ -83,7 +83,7 @@
                     <label class="col-sm-1 control-label">创建时间</label>
                     <div class="col-sm-4">
                         <input readonly type="text" class="form-control" name="createTime" placeholder=""
-                               th:value="${#temporals.format(user.createTime, 'yyyy-MM-dd HH:mm')}">
+                               th:value="${#temporals.format(user.createTime, 'yyyy-MM-dd HH:mm:ss')}">
                     </div>
                     <label class="control-label">（系统自动生成）</label>
                 </div>

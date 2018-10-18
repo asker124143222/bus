@@ -24,6 +24,23 @@ spring:
   messages:
     basename: myconfig
 
+  cache:
+    redis:
+      time-to-live: 60s
+    type: redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456@abc.com
+    timeout: 10000
+    lettuce:
+      pool:
+        max-idle: 10
+        max-active: 10
+        min-idle: 5
+        max-wait: 10000
+    database: 0
+
 
 
 

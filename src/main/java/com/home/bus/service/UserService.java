@@ -4,6 +4,8 @@ package com.home.bus.service;
 import com.home.bus.entity.User;
 import com.home.bus.model.ISysPermission;
 import com.home.bus.model.IUserRole;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,8 +17,9 @@ import java.util.Optional;
  * @Date: 2018/8/11 16:45
  * @Description:
  */
-
+@CacheConfig(cacheNames = "user")
 public interface UserService {
+    @Cacheable(key = "'userName'.concat(#userName)")
     User findByUserName(String userName);
 
     Optional<User> findUserById(Integer userId);
