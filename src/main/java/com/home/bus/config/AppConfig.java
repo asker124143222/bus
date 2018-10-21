@@ -1,5 +1,6 @@
 package com.home.bus.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -7,10 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * @Date: 2018/6/14 16:08
  * @Description:
  */
-@Configuration
+//@Configuration
 public class AppConfig {
-//    @Bean
-//    public LayoutDialect layoutDialect() {
-//        return new LayoutDialect();
-//    }
+
 }

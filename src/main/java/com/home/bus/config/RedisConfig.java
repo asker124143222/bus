@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,14 +17,10 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.*;
-import org.springframework.lang.Nullable;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @Author: xu.dm
@@ -30,11 +28,12 @@ import java.util.Set;
  * @Description:
  */
 @Configuration
-@EnableCaching
+@AutoConfigureAfter(RedisAutoConfiguration.class)
+//@EnableCaching
 public class RedisConfig extends CachingConfigurerSupport {
     @Resource
     private LettuceConnectionFactory lettuceConnectionFactory;
-    private Duration timeToLive = Duration.ofSeconds(60);
+    private Duration timeToLive = Duration.ofSeconds(60*60);
 
     @Bean
     public KeyGenerator keyGenerator() {
@@ -58,7 +57,8 @@ public class RedisConfig extends CachingConfigurerSupport {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer()))
-                .disableCachingNullValues().entryTtl(timeToLive);
+                .disableCachingNullValues()
+                .entryTtl(timeToLive);
 
 
         RedisCacheManager.RedisCacheManagerBuilder builder = RedisCacheManager.RedisCacheManagerBuilder
@@ -106,17 +106,17 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     private RedisSerializer<Object> valueSerializer() {
-        // 设置序列化
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(
-                Object.class);
-        ObjectMapper om = new ObjectMapper();
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-        jackson2JsonRedisSerializer.setObjectMapper(om);
-        return jackson2JsonRedisSerializer;
+//        // 设置序列化
+//        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(
+//                Object.class);
+//        ObjectMapper om = new ObjectMapper();
+//        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+//        jackson2JsonRedisSerializer.setObjectMapper(om);
+//        return jackson2JsonRedisSerializer;
 
-        //两种方式区别不大
-        //return new GenericJackson2JsonRedisSerializer();
+        //两种区别，主要是序列化List
+        return new GenericJackson2JsonRedisSerializer();
     }
 
 }

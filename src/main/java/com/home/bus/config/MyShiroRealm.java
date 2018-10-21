@@ -17,6 +17,7 @@ import org.apache.shiro.util.ByteSource;
 import org.springframework.context.annotation.Lazy;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 public class MyShiroRealm extends AuthorizingRealm {
 
@@ -31,14 +32,13 @@ public class MyShiroRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         //如果授权部分没有传入User对象，这里只能取到userName
         //也就是SimpleAuthenticationInfo构造的时候第一个参数传递需要User对象
-        User user  = (User)principals.getPrimaryPrincipal();
+        User user = (User) principals.getPrimaryPrincipal();
 
-        for(IUserRole role:user.getRoleList())
-        {
+        for (IUserRole role : user.getRoleList()) {
             authorizationInfo.addRole(role.getRole());
         }
-        for(ISysPermission p:user.getPermissionList())
-        {
+
+        for (ISysPermission p : user.getPermissionList()) {
             authorizationInfo.addStringPermission(p.getPermission());
         }
 //        for(SysRole role:user.getRoleList()){
@@ -56,19 +56,19 @@ public class MyShiroRealm extends AuthorizingRealm {
             throws AuthenticationException {
         System.out.println("MyShiroRealm.doGetAuthenticationInfo()");
         //获取用户的输入的账号.
-        String userName = (String)token.getPrincipal();
-        if(userName==null)
+        String userName = (String) token.getPrincipal();
+        if (userName == null)
             return null;
 //        System.out.println(token.getCredentials());
         //通过username从数据库中查找 User对象，如果找到，没找到.
         //实际项目中，这里可以根据实际情况做缓存，如果不做，Shiro自己也是有时间间隔机制，2分钟内不会重复执行该方法
         User user = userService.findByUserName(userName);
-        System.out.println("----->>user="+user);
-        if(user == null){
+        System.out.println("----->>user=" + user);
+        if (user == null) {
             return null;
         }
-        user.setRoleList(userService.findUserRoleByUserName(user.getUserName()));
         user.setPermissionList(userService.findUserRolePermissionByUserName(user.getUserName()));
+        user.setRoleList(userService.findUserRoleByUserName(user.getUserName()));
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
                 user, //这里传入的是user对象，比对的是用户名，直接传入用户名也没错，但是在授权部分就需要自己重新从数据库里取权限
                 user.getPassword(), //密码
