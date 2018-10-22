@@ -22,7 +22,9 @@ public interface UserService {
 
     User save(User user);
 
+    //新增用户判断是否有重名的
     boolean checkUserExists(String userName);
+    //修改用户判断是否有重名的，不包括即将被修改的原名
     boolean checkUserExists2(String oldUserName, String newUserName);
 
     List<IUserRole> findUserRoleByUserName(String userName);

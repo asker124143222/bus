@@ -25,7 +25,7 @@ import java.util.List;
  */
 
 @Entity
-public class User {
+public class User implements Serializable {
     @Id
     @GenericGenerator(name="generator",strategy = "native")
     @GeneratedValue(generator = "generator")

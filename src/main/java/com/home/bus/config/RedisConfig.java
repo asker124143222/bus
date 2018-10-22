@@ -79,24 +79,28 @@ public class RedisConfig extends CachingConfigurerSupport {
 
     /**
      * RedisTemplate配置
+     * GenericJackson2JsonRedisSerializer 不能反序列化没有无参数构造函数的类，不能反序列化 接口的动态代理类，原因相同
+     * Jackson2JsonRedisSerializer 不能直接序列化Map和list（貌似）然后GenericJackson2JsonRedisSerializer不能的它也不能
+     * JdkSerializationRedisSerializer 没有以上缺点，序列化后，可读性差，序列化的对象必须实现Serializable
+     *
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
         // 设置序列化
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(
-                Object.class);
-        ObjectMapper om = new ObjectMapper();
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-        jackson2JsonRedisSerializer.setObjectMapper(om);
+//        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(
+//                Object.class);
+//        ObjectMapper om = new ObjectMapper();
+//        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+//        jackson2JsonRedisSerializer.setObjectMapper(om);
         // 配置redisTemplate
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
         redisTemplate.setConnectionFactory(lettuceConnectionFactory);
         RedisSerializer<?> stringSerializer = new StringRedisSerializer();
         redisTemplate.setKeySerializer(stringSerializer);// key序列化
-        redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);// value序列化
+        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());// value序列化
         redisTemplate.setHashKeySerializer(stringSerializer);// Hash key序列化
-        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);// Hash value序列化
+        redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());// Hash value序列化
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }

@@ -31,7 +31,7 @@ import java.util.Optional;
  */
 @Service
 public class UserServiceImpl implements UserService {
-    private String keyPrefix = "user:";
+    private String keyPrefix = "user:";//冒号分隔
 
     @Resource
     private UserRepository userRepository;
@@ -42,24 +42,29 @@ public class UserServiceImpl implements UserService {
     @Resource
     private CommonCacheConfig cacheConfig;
 
-    @Override
-    public User findByUserName(String userName) {
+    private User findByUserNameInCache(String userName) {
         User user = null;
         String key = keyPrefix + userName;
 
-        if (cacheConfig.isCacheEnable() && cacheService.hasKey(key)) {
+        if (cacheService.hasKey(key)) {
             user = (User) cacheService.get(key);
-            cacheService.expire(key,cacheConfig.getTimeToLive());
-            System.out.println("----->>findByUserName读取缓存：" + user.getUserName());
+            cacheService.expire(key, cacheConfig.getTimeToLive());
+            System.out.println("----->>findByUserName 读取缓存：" + key);
             return user;
         }
 
         user = userRepository.findByUserName(userName);
-        if(cacheConfig.isCacheEnable()) {
-            System.out.println("----->>findByUserName写入缓存：" + user.getUserName());
-            cacheService.set(key, user, cacheConfig.getTimeToLive());
-        }
+        System.out.println("----->>findByUserName 写入缓存：" + key);
+        cacheService.set(key, user, cacheConfig.getTimeToLive());
+
         return user;
+    }
+
+    @Override
+    public User findByUserName(String userName) {
+        if (cacheConfig.isCacheEnable())
+            return findByUserNameInCache(userName);
+        return userRepository.findByUserName(userName);
     }
 
     @Override
@@ -72,8 +77,25 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAllUserRoleByUserId(userId);
     }
 
+    private List<ISysPermission> findUserRolePermissionInCache(String userName) {
+        String key = this.keyPrefix + "UserRolePermission:" + userName;
+        List<ISysPermission> sysPermissions = null;
+        if (cacheService.hasKey(key)) {
+            sysPermissions = (List<ISysPermission>) cacheService.get(key);
+            cacheService.expire(key, cacheConfig.getTimeToLive());
+            return sysPermissions;
+        }
+        sysPermissions = userRepository.findUserRolePermissionByUserName(userName);
+        cacheService.set(key, sysPermissions, cacheConfig.getTimeToLive());
+        return sysPermissions;
+    }
+
     @Override
     public List<ISysPermission> findUserRolePermissionByUserName(String userName) {
+        //序列化有问题，先注销
+//        if (cacheConfig.isCacheEnable())
+//            return findUserRolePermissionInCache(userName);
+
         return userRepository.findUserRolePermissionByUserName(userName);
     }
 
@@ -82,24 +104,34 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId);
     }
 
+    private void deleteCache(User user) {
+
+
+        String key1 = this.keyPrefix + user.getUserName();
+        String key2 = this.keyPrefix + user.getUserId();
+        String key3 = this.keyPrefix + "UserRolePermission:" + user.getUserName();
+
+        System.out.println("----->>save 删除缓存：key1:" + key1 + ",key2:" + key2);
+        cacheService.del(key1, key2,key3);
+    }
+
     @Override
     public User save(User user) {
 
         User u = userRepository.save(user);
-
-        if(cacheConfig.isCacheEnable()) {
-            String key1 = this.keyPrefix+user.getUserName();
-            String key2 = this.keyPrefix+user.getUserId();
-
-            System.out.println("----->>删除缓存：key1:" + key1+",key2:"+key2);
-            cacheService.del(key1,key2);
+        try {
+            if(cacheConfig.isCacheEnable())
+                deleteCache(u);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
         return u;
     }
 
     @Override
     public boolean checkUserExists(String userName) {
-        User user = userRepository.findByUserName(userName);
+        User user = this.findByUserName(userName);
         if (user != null)
             return true;
         else
@@ -116,8 +148,29 @@ public class UserServiceImpl implements UserService {
             return false;
     }
 
+    private Page<User> findAllByUserNameContainsInCache(String userName, Pageable pageable) {
+
+        String key = this.keyPrefix + userName + ":" + pageable.toString();
+        Page<User> userPage = null;
+        if (cacheService.hasKey(key)) {
+            userPage = (Page<User>) cacheService.get(key);
+            cacheService.expire(key, cacheConfig.getTimeToLive());
+            System.out.println("----->>findAllByUserNameContains 读取缓存：" + key);
+            return userPage;
+        }
+
+        userPage = userRepository.findAllByUserNameContains(userName, pageable);
+        cacheService.set(key, userPage, cacheConfig.getTimeToLive());
+        System.out.println("----->>findAllByUserNameContains 写入缓存：" + key);
+
+        return userPage;
+
+    }
+
     @Override
     public Page<User> findAllByUserNameContains(String userName, Pageable pageable) {
+        if (cacheConfig.isCacheEnable())
+            return findAllByUserNameContainsInCache(userName, pageable);
         return userRepository.findAllByUserNameContains(userName, pageable);
     }
 
