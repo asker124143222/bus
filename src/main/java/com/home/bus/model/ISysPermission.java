@@ -1,5 +1,7 @@
 package com.home.bus.model;
 
+import java.io.Serializable;
+
 /**
  * @Author: xu.dm
  * @Date: 2018/9/21 20:37

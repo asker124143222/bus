@@ -81,20 +81,22 @@ public class UserServiceImpl implements UserService {
         String key = this.keyPrefix + "UserRolePermission:" + userName;
         List<ISysPermission> sysPermissions = null;
         if (cacheService.hasKey(key)) {
+            System.out.println("----->>UserRolePermission 读取缓存：" + key);
             sysPermissions = (List<ISysPermission>) cacheService.get(key);
             cacheService.expire(key, cacheConfig.getTimeToLive());
             return sysPermissions;
         }
         sysPermissions = userRepository.findUserRolePermissionByUserName(userName);
+        System.out.println("----->>UserRolePermission 写入缓存：" + key);
         cacheService.set(key, sysPermissions, cacheConfig.getTimeToLive());
         return sysPermissions;
     }
 
     @Override
     public List<ISysPermission> findUserRolePermissionByUserName(String userName) {
-        //序列化有问题，先注销
-//        if (cacheConfig.isCacheEnable())
-//            return findUserRolePermissionInCache(userName);
+        //反序列化有问题，先注销
+        if (cacheConfig.isCacheEnable())
+            return findUserRolePermissionInCache(userName);
 
         return userRepository.findUserRolePermissionByUserName(userName);
     }

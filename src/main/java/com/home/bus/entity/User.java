@@ -60,6 +60,9 @@ public class User implements Serializable {
     private String email;
     private String tel;
 
+    public User() {
+    }
+
     public List<IUserRole> getRoleList() {
         return roleList;
     }
