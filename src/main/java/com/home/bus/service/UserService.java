@@ -18,7 +18,7 @@ import java.util.Optional;
 public interface UserService {
     User findByUserName(String userName);
 
-    Optional<User> findUserById(Integer userId);
+    User findUserById(Integer userId);
 
     User save(User user);
 

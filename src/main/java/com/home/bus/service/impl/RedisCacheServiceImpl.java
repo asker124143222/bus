@@ -24,6 +24,12 @@ public class RedisCacheServiceImpl implements CacheService {
 
     //=============================common============================
 
+
+    @Override
+    public Set<String> getKey(String pattern) {
+        return redisTemplate.keys(pattern);
+    }
+
     /**
      * 指定缓存失效时间
      *

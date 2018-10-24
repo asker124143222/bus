@@ -14,6 +14,9 @@ public interface CacheService {
 
 // =========common=========
 
+    //返回指定key，即redis keys命令
+    Set<String> getKey(String pattern);
+
     /**
      * 指定缓存失效时间
      *

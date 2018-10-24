@@ -173,7 +173,7 @@ public class UserController {
     @RequiresPermissions("user:edit")
     public String edit(@PathVariable("id")Integer id, Map<String,Object> map)
     {
-        User user = userService.findUserById(id).orElse(new User());
+        User user = userService.findUserById(id);
         map.put("user",user);
         return "/user/userAdd";
     }
@@ -218,7 +218,7 @@ public class UserController {
     @RequiresPermissions("user:roleGrant")
     public String listUserRole(@PathVariable("userId")Integer userId, Map<String, Object> map)
     {
-        User user = userService.findUserById(userId).orElse(new User());
+        User user = userService.findUserById(userId);
         map.put("user",user);
         return "/user/userRole";
     }
