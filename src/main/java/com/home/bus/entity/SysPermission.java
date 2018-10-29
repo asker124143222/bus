@@ -12,7 +12,7 @@ import java.util.List;
  * @Description:
  */
 @Entity
-public class SysPermission {
+public class SysPermission implements Serializable {
     @Id
     @GenericGenerator(name="generator",strategy = "native")
     @GeneratedValue(generator = "generator")

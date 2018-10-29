@@ -24,7 +24,7 @@ import java.util.List;
  * @Description:
  */
 @Entity
-public class SysRole {
+public class SysRole implements Serializable {
     @Id
     @GenericGenerator(name="generator",strategy = "native")
     @GeneratedValue(generator = "generator")

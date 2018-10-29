@@ -29,6 +29,7 @@ import java.util.Set;
  * @Author: xu.dm
  * @Date: 2018/8/11 16:47
  * @Description:
+ * 缓存设计ps：
  */
 @Service
 public class UserServiceImpl implements UserService {
@@ -153,7 +154,7 @@ public class UserServiceImpl implements UserService {
         }
 
 
-
+        //缺省查询状态下userName=空字符
         key = this.keyPrefix + ":";
         keys = cacheService.getKey(key+"*");
         if(keys!=null && keys.size()>0)

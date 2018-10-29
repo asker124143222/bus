@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,8 +22,14 @@ public class RedisCacheServiceImpl implements CacheService {
     //=============================common============================
 
 
+    //有点危险，如果输入pattern不合理可能造成redis服务卡顿，比如直接输入*号
     @Override
     public Set<String> getKey(String pattern) {
+        //如果key输入时*号，则返回空的Set
+        if(pattern.equals("*"))
+        {
+            return new HashSet<>();
+        }
         return redisTemplate.keys(pattern);
     }
 

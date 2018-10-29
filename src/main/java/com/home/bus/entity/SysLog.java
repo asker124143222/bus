@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
  * @Description:系统日志
  */
 @Entity
-public class SysLog {
+public class SysLog implements Serializable {
     @Id
     @GenericGenerator(name="generator",strategy = "native")
     @GeneratedValue(generator = "generator")
