@@ -1,4 +1,4 @@
-package com.home.bus.utils;
+package com.home.bus.redis_shiro;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;

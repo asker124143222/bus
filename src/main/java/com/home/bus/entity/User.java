@@ -26,6 +26,8 @@ import java.util.List;
 
 @Entity
 public class User implements Serializable {
+
+    private static final long serialVersionUID = 5887833463461262508L;
     @Id
     @GenericGenerator(name="generator",strategy = "native")
     @GeneratedValue(generator = "generator")

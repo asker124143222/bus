@@ -13,6 +13,7 @@ import java.util.List;
  */
 @Entity
 public class SysPermission implements Serializable {
+    private static final long serialVersionUID = -2985090918956872791L;
     @Id
     @GenericGenerator(name="generator",strategy = "native")
     @GeneratedValue(generator = "generator")

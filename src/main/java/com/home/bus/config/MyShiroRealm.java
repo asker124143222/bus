@@ -22,7 +22,7 @@ import java.util.List;
 public class MyShiroRealm extends AuthorizingRealm {
 
     @Resource
-    @Lazy
+//    @Lazy  //与springboot集成缓存开启@EnableCaching的时候，确保shiro的bean可以先实例化
     private UserService userService;
 
     //权限信息，包括角色以及权限

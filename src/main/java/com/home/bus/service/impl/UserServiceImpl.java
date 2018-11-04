@@ -101,7 +101,6 @@ public class UserServiceImpl implements UserService {
         //反序列化有问题，先注销
 //        if (cacheConfig.isCacheEnable())
 //            return findUserRolePermissionInCache(userName);
-
         return userRepository.findUserRolePermissionByUserName(userName);
     }
 
@@ -168,12 +167,14 @@ public class UserServiceImpl implements UserService {
     public User save(User user) {
 
         User u = userRepository.save(user);
-        try {
-            if(cacheConfig.isCacheEnable())
-                deleteCache(u);
-        }catch (Exception e)
+        if(cacheConfig.isCacheEnable())
         {
-            e.printStackTrace();
+            try {
+                deleteCache(u);
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
         return u;
     }
@@ -198,7 +199,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private Page<User> findAllByUserNameContainsInCache(String userName, Pageable pageable) {
-
         String key = this.keyPrefix + userName + ":" + pageable.toString();
         Page<User> userPage;
         if (cacheService.hasKey(key)) {
@@ -218,8 +218,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> findAllByUserNameContains(String userName, Pageable pageable) {
-        if (cacheConfig.isCacheEnable())
-            return findAllByUserNameContainsInCache(userName, pageable);
+//        if (cacheConfig.isCacheEnable())
+//            return findAllByUserNameContainsInCache(userName, pageable);
         return userRepository.findAllByUserNameContains(userName, pageable);
     }
 
@@ -236,7 +236,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    //删除和userid关联对象的所有缓存
+    //删除和userId关联对象的所有缓存
     private void deleteCacheByUserId(List<Integer> userIdList)
     {
         User user;
@@ -303,15 +303,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteAllUserRoleByUserId(Integer userId) {
-        try {
-            if(cacheConfig.isCacheEnable()) {
+        if(cacheConfig.isCacheEnable()) {
+            try {
                 List<Integer> userIdList = new ArrayList<>();
                 userIdList.add(userId);
                 deleteCacheByUserId(userIdList);
+            }catch (Exception e)
+            {
+                e.printStackTrace();
             }
-        }catch (Exception e)
-        {
-            e.printStackTrace();
         }
         userRepository.deleteAllUserRoleByUserId(userId);
     }
@@ -319,17 +319,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void grantUserRole(Integer userId, List<Integer> roleIdList) {
-//        try {
-//            if(cacheConfig.isCacheEnable()) {
-//                List<Integer> userIdList = new ArrayList<>();
-//                userIdList.add(userId);
-//                deleteCacheByUserId(userIdList);
-//            }
-//        }catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
-//        userRepository.deleteAllUserRoleByUserId(userId);
         deleteAllUserRoleByUserId(userId);
         for (Integer roleId : roleIdList) {
             userRepository.insertUserRole(userId, roleId);

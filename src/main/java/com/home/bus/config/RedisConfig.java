@@ -1,18 +1,7 @@
 package com.home.bus.config;
 
-import com.alibaba.fastjson.parser.ParserConfig;
-import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
-import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
-import com.esotericsoftware.kryo.Kryo;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.home.bus.utils.KryoRedisSerializer;
-import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
+import com.home.bus.redis_shiro.RedisObjectSerializer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.interceptor.KeyGenerator;
@@ -34,13 +23,15 @@ import java.time.Duration;
  * @Description:
  */
 @Configuration
-@AutoConfigureAfter(RedisAutoConfiguration.class)
-//@EnableCaching
+//@EnableCaching //开启springboot注解式缓存
 public class RedisConfig extends CachingConfigurerSupport {
+    @Value("${spring.cache.time-to-live}")
+    private long timeToLive;
+
     @Resource
     private LettuceConnectionFactory lettuceConnectionFactory;
 
-    private Duration timeToLive = Duration.ofSeconds(60*60);
+//    private Duration timeToLive = Duration.ofSeconds(60*60);
 
     @Bean
     public KeyGenerator keyGenerator() {
@@ -65,7 +56,7 @@ public class RedisConfig extends CachingConfigurerSupport {
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer()))
                 .disableCachingNullValues()
-                .entryTtl(timeToLive);
+                .entryTtl(Duration.ofSeconds(this.timeToLive));
 
 
         RedisCacheManager.RedisCacheManagerBuilder builder = RedisCacheManager.RedisCacheManagerBuilder
@@ -91,7 +82,6 @@ public class RedisConfig extends CachingConfigurerSupport {
      * fashjson（GenericFastJsonRedisSerializer和FastJson2JsonRedisSerializer）不能反序列化动态代理类 ，不能反序列化没有无参数构造函数的类
      * kyro-serializers 可以序列化无缺省构造函数的类，序列化后占用空间小，但是不能反序列化动态代理类
      * JdkSerializationRedisSerializer 不能（反）序列化动态代理类，序列化后可读性差，占用空间大，序列化的对象必须实现Serializable
-     *
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
@@ -118,10 +108,21 @@ public class RedisConfig extends CachingConfigurerSupport {
         redisTemplate.setConnectionFactory(lettuceConnectionFactory);
         RedisSerializer<?> stringSerializer = new StringRedisSerializer();
         redisTemplate.setKeySerializer(stringSerializer);// key序列化
-        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());// value序列化
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());// value序列化
         redisTemplate.setHashKeySerializer(stringSerializer);// Hash key序列化
-        redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());// Hash value序列化
+        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());// Hash value序列化
         redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    @Bean(name = "redisTemplate2")
+    public RedisTemplate<String, Object> redisTemplate2(LettuceConnectionFactory lettuceConnectionFactory) {
+
+        // 配置redisTemplate
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
+        redisTemplate.setConnectionFactory(lettuceConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());// key序列化
+        redisTemplate.setValueSerializer(new RedisObjectSerializer());// value序列化
         return redisTemplate;
     }
 
@@ -140,7 +141,10 @@ public class RedisConfig extends CachingConfigurerSupport {
 //        return jackson2JsonRedisSerializer;
 
         //两种区别，主要是序列化List
-        return new GenericJackson2JsonRedisSerializer();
+//        return new GenericJackson2JsonRedisSerializer();
+
+        //第三种
+        return new RedisObjectSerializer();
     }
 
 }

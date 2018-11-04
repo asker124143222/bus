@@ -31,7 +31,7 @@ spring:
 #     如果引入redis等缓存后，就会用引入的缓存框架，如果不想用可以强制type:simple
 #    type: simple
   redis:
-    host: 127.0.0.1
+    host: 192.168.31.10
     port: 6379
     password: 123456@abc.com
     timeout: 10000

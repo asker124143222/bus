@@ -4,6 +4,8 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.home.bus.model.LoginResult;
 import com.home.bus.service.LogService;
 import com.home.bus.service.LoginService;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -102,6 +104,7 @@ public class HomeController {
         String verifyCode = request.getParameter("verifyCode");
         String rightCode = (String) request.getSession().getAttribute("verifyCode");
         Long verifyCodeTTL = (Long) request.getSession().getAttribute("verifyCodeTTL");
+
         Long currentMillis = System.currentTimeMillis();
         if (rightCode == null || verifyCodeTTL == null) {
             map.put("msg", "请刷新图片，输入验证码！");

@@ -1,4 +1,4 @@
-package com.home.bus.utils;
+package com.home.bus.redis_shiro;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
 /**
  * @Author: xu.dm
  * @Date: 2018/10/23 22:26
- * @Description:
+ * @Description:kryo实现redis序列化
  */
 public class KryoRedisSerializer<T> implements RedisSerializer<T> {
 

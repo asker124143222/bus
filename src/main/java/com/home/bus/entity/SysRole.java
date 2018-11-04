@@ -25,6 +25,7 @@ import java.util.List;
  */
 @Entity
 public class SysRole implements Serializable {
+    private static final long serialVersionUID = 8908550596207293603L;
     @Id
     @GenericGenerator(name="generator",strategy = "native")
     @GeneratedValue(generator = "generator")
