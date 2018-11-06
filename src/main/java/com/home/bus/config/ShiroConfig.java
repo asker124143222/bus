@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 @Configuration
@@ -25,6 +26,9 @@ public class ShiroConfig {
 
     @Value("${spring.cache.time-to-live}")
     private int timeToLive;
+
+//    @Resource
+//    private RedisCacheManager redisCacheManager;
 
     @Bean
     public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager) {
@@ -123,7 +127,7 @@ public class ShiroConfig {
     public SimpleCookie cookie() {
         SimpleCookie cookie = new SimpleCookie("bus.session.id"); //  cookie的name,对应的默认是 JSESSIONID
         cookie.setHttpOnly(true);
-//        cookie.setMaxAge(-1);
+        cookie.setMaxAge(-1);
         cookie.setPath("/");        //  path为 / 用于多个系统共享JSESSIONID
         return cookie;
     }
@@ -137,12 +141,14 @@ public class ShiroConfig {
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
         //单位是毫秒
         sessionManager.setGlobalSessionTimeout(60 * 30 *1000);
+        sessionManager.setSessionValidationSchedulerEnabled(true);
+        sessionManager.setSessionValidationInterval(60 * 30 *1000);
         sessionManager.setDeleteInvalidSessions(true);
         sessionManager.setSessionIdCookie(cookie());
         sessionManager.setSessionIdCookieEnabled(true);
 
         sessionManager.setSessionDAO(redisSessionDAO());
-//        sessionManager.setCacheManager(redisCacheManager());
+        sessionManager.setCacheManager(redisCacheManager());
         return sessionManager;
     }
 

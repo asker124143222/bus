@@ -1,6 +1,8 @@
 package com.home.bus.redis_shiro;
 
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.ValidatingSession;
+import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,28 +20,26 @@ import java.util.concurrent.TimeUnit;
  * @Description:redis实现共享session
  */
 @Component
-public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
-
-    @Value("${spring.cache.time-to-live}")
-    private int timeToLive;
+public class RedisSessionDAO extends CachingSessionDAO {
 
     private Logger logger = LoggerFactory.getLogger(RedisSessionDAO.class);
 
     // session 在redis过期时间是30分钟30*60
-    private int expireTime = timeToLive;
+    @Value("${spring.cache.time-to-live}")
+    private int expireTime=3600;
 
     private String prefix = "bus-shiro-session:";
 
     @Resource(name = "redisTemplate2")
     private RedisTemplate<String, Object> redisTemplate;
 
-
     // 创建session，保存到数据库
     @Override
     protected Serializable doCreate(Session session) {
-        Serializable sessionId = super.doCreate(session);
+        Serializable sessionId = generateSessionId(session);
+        assignSessionId(session, sessionId);
 
-        logger.debug("创建session:{}", session.getId());
+        logger.info("创建session:{}", session.getId());
         redisTemplate.opsForValue().set(prefix + sessionId.toString(), session);
         return sessionId;
     }
@@ -47,16 +47,31 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
     // 获取session
     @Override
     protected Session doReadSession(Serializable sessionId) {
-        logger.debug("获取session:{}", sessionId);
-        return (Session) redisTemplate.opsForValue().get(prefix + sessionId.toString());
+
+        logger.info("读取session:{}", sessionId);
+
+        Session session = super.getCachedSession(sessionId);
+        if (session == null) {
+            session = (Session) redisTemplate.opsForValue().get(prefix + sessionId.toString());
+        }
+        return session;
 
     }
 
     // 更新session的最后一次访问时间
     @Override
     protected void doUpdate(Session session) {
-        super.doUpdate(session);
-        logger.debug("获取session:{}", session.getId());
+        //如果会话过期/停止 没必要再更新了
+        try {
+            if (session instanceof ValidatingSession && !((ValidatingSession) session).isValid()) {
+                return;
+            }
+        } catch (Exception e) {
+            logger.error("ValidatingSession error");
+        }
+
+
+        logger.info("更新session:{}", session.getId());
         String key = prefix + session.getId().toString();
         if (!redisTemplate.hasKey(key)) {
             redisTemplate.opsForValue().set(key, session);
@@ -67,8 +82,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
     // 删除session
     @Override
     protected void doDelete(Session session) {
-        logger.debug("删除session:{}", session.getId());
-        super.doDelete(session);
+        logger.info("删除session:{}", session.getId());
         redisTemplate.delete(prefix + session.getId().toString());
     }
 }
