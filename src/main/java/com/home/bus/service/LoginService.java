@@ -1,6 +1,7 @@
 package com.home.bus.service;
 
 import com.home.bus.model.LoginResult;
+import org.apache.shiro.session.Session;
 
 /**
  * @Author: xu.dm
@@ -10,5 +11,6 @@ import com.home.bus.model.LoginResult;
 public interface LoginService {
     LoginResult login(String userName, String password);
     String getCurrentUserName();
+    Session getSession();
     void logout();
 }

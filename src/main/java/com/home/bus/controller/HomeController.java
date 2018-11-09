@@ -4,8 +4,6 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.home.bus.model.LoginResult;
 import com.home.bus.service.LogService;
 import com.home.bus.service.LoginService;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

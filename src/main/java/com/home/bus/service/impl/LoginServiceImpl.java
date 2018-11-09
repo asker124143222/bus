@@ -79,4 +79,11 @@ public class LoginServiceImpl implements LoginService {
         Session session = currentUser.getSession();
         return (String)session.getAttribute("userName");
     }
+
+    @Override
+    public Session getSession() {
+        Subject currentUser = SecurityUtils.getSubject();
+        Session session = currentUser.getSession();
+        return session;
+    }
 }

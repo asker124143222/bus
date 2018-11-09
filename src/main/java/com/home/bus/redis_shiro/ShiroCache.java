@@ -25,20 +25,23 @@ public class ShiroCache<K, V> implements Cache<K, V> {
 
     @SuppressWarnings("rawtypes")
     public ShiroCache(String name, RedisTemplate client) {
+        if(client==null)
+            throw new NullPointerException();
+
         this.cacheKey = REDIS_SHIRO_CACHE + name + ":";
         this.redisTemplate = client;
     }
 
     @Override
     public V get(K key) throws CacheException {
-        redisTemplate.boundValueOps(getCacheKey(key)).expire(globExpire, TimeUnit.MINUTES);
-        return redisTemplate.boundValueOps(getCacheKey(key)).get();
+        redisTemplate.expire(getCacheKey(key),globExpire, TimeUnit.MINUTES);
+        return redisTemplate.opsForValue().get(getCacheKey(key));
     }
 
     @Override
     public V put(K key, V value) throws CacheException {
         V old = get(key);
-        redisTemplate.boundValueOps(getCacheKey(key)).set(value);
+        redisTemplate.opsForValue().set(getCacheKey(key),value,globExpire,TimeUnit.MINUTES);
         return old;
     }
 

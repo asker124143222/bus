@@ -26,7 +26,7 @@ import java.time.Duration;
 //@EnableCaching //开启springboot注解式缓存
 public class RedisConfig extends CachingConfigurerSupport {
     @Value("${spring.cache.time-to-live}")
-    private long timeToLive;
+    private long timeToLive=3600;
 
     @Resource
     private LettuceConnectionFactory lettuceConnectionFactory;

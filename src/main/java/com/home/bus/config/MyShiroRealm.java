@@ -4,7 +4,9 @@ package com.home.bus.config;
 import com.home.bus.entity.User;
 import com.home.bus.model.ISysPermission;
 import com.home.bus.model.IUserRole;
+import com.home.bus.redis_shiro.RedisSessionDAO;
 import com.home.bus.service.UserService;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -12,11 +14,14 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.context.annotation.Lazy;
 
 import javax.annotation.Resource;
+import java.io.Serializable;
 import java.util.List;
 
 public class MyShiroRealm extends AuthorizingRealm {
@@ -75,6 +80,7 @@ public class MyShiroRealm extends AuthorizingRealm {
                 ByteSource.Util.bytes(user.getCredentialsSalt()),//salt=username+salt
                 getName()  //realm name
         );
+
         return authenticationInfo;
     }
 

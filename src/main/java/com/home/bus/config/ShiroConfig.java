@@ -1,13 +1,10 @@
 package com.home.bus.config;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
-import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.home.bus.redis_shiro.RedisCacheManager;
 import com.home.bus.redis_shiro.RedisSessionDAO;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
-import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -19,7 +16,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
 
 @Configuration
 public class ShiroConfig {
@@ -27,8 +26,8 @@ public class ShiroConfig {
     @Value("${spring.cache.time-to-live}")
     private int timeToLive;
 
-//    @Resource
-//    private RedisCacheManager redisCacheManager;
+    @Resource
+    private RedisCacheManager redisCacheManager;
 
     @Bean
     public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager) {
@@ -80,6 +79,17 @@ public class ShiroConfig {
     public MyShiroRealm myShiroRealm() {
         MyShiroRealm myShiroRealm = new MyShiroRealm();
         myShiroRealm.setCredentialsMatcher(hashedCredentialsMatcher());
+
+        myShiroRealm.setCachingEnabled(true);
+        //启用身份验证缓存，即缓存AuthenticationInfo信息，默认false
+        myShiroRealm.setAuthenticationCachingEnabled(false);
+        //缓存AuthenticationInfo信息的缓存名称
+        myShiroRealm.setAuthenticationCacheName("authenticationCache");
+        //启用授权缓存，即缓存AuthorizationInfo信息，默认false
+        myShiroRealm.setAuthorizationCachingEnabled(true);
+        //缓存AuthorizationInfo信息的缓存名称
+        myShiroRealm.setAuthorizationCacheName("authorizationCache");
+
         return myShiroRealm;
     }
 
@@ -87,12 +97,12 @@ public class ShiroConfig {
     @Bean
     public SecurityManager securityManager() {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+        // 自定义缓存实现 使用redis
+        securityManager.setCacheManager(redisCacheManager);
+        // 自定义session管理 使用redis
+//        securityManager.setSessionManager(sessionManager());
         //自定义realm
         securityManager.setRealm(myShiroRealm());
-        // 自定义缓存实现 使用redis
-//        securityManager.setCacheManager(redisCacheManager());
-        // 自定义session管理 使用redis
-        securityManager.setSessionManager(sessionManager());
 
         return securityManager;
     }
@@ -112,15 +122,14 @@ public class ShiroConfig {
     }
 
 
-    @Bean
-    public RedisCacheManager redisCacheManager() {
-        return new RedisCacheManager();
-    }
+//    @Bean
+//    public RedisCacheManager redisCacheManager() {
+//        return new RedisCacheManager();
+//    }
 
     @Bean
-    public RedisSessionDAO redisSessionDAO()
-    {
-        return new RedisSessionDAO();
+    public RedisSessionDAO redisSessionDAO() {
+        return new RedisSessionDAO(redisCacheManager);
     }
 
     @Bean
@@ -140,21 +149,23 @@ public class ShiroConfig {
     public DefaultWebSessionManager sessionManager() {
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
         //单位是毫秒
-        sessionManager.setGlobalSessionTimeout(60 * 30 *1000);
+        sessionManager.setSessionIdUrlRewritingEnabled(false);
+        sessionManager.setGlobalSessionTimeout(60 * 30 * 1000);
         sessionManager.setSessionValidationSchedulerEnabled(true);
-        sessionManager.setSessionValidationInterval(60 * 30 *1000);
+        sessionManager.setSessionValidationInterval(60 * 30 * 1000);
         sessionManager.setDeleteInvalidSessions(true);
         sessionManager.setSessionIdCookie(cookie());
         sessionManager.setSessionIdCookieEnabled(true);
 
+        sessionManager.setCacheManager(redisCacheManager);
         sessionManager.setSessionDAO(redisSessionDAO());
-        sessionManager.setCacheManager(redisCacheManager());
         return sessionManager;
     }
 
 
     /**
-     * Shiro生命周期处理器
+     * Shiro生命周期处理器，据说有bug，至少在与springcache集成的时候已经验证
+     * 需要单独用一个configure来定义，或者直接注释
      */
 //    @Bean
 //    public LifecycleBeanPostProcessor getLifecycleBeanPostProcessor() {
@@ -167,6 +178,15 @@ public class ShiroConfig {
         return new ShiroDialect();
     }
 
+    /**
+     * 解决： 无权限页面不跳转 shiroFilterFactoryBean.setUnauthorizedUrl("/unauthorized") 无效
+     * shiro的源代码ShiroFilterFactoryBean.Java定义的filter必须满足filter instanceof AuthorizationFilter，
+     * 只有perms，roles，ssl，rest，port才是属于AuthorizationFilter，而anon，authcBasic，auchc，user是AuthenticationFilter，
+     * 所以unauthorizedUrl设置后页面不跳转 Shiro注解模式下，登录失败与没有权限都是通过抛出异常。
+     * 并且默认并没有去处理或者捕获这些异常。在SpringMVC下需要配置捕获相应异常来通知用户信息
+     *
+     * @return
+     */
     @Bean(name = "simpleMappingExceptionResolver")
     public SimpleMappingExceptionResolver
     createSimpleMappingExceptionResolver() {
