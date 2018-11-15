@@ -6,11 +6,14 @@ import com.home.bus.service.LogService;
 import com.home.bus.utils.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.framework.AopContext;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -39,24 +42,19 @@ public class LogServiceImpl implements LogService {
     private Logger logger = LoggerFactory.getLogger(LogServiceImpl.class);
 
     @Override
-    public void writeLog(String action,String event)
+    @Async("logThread")
+    public void writeLog(SysLog sysLog)
     {
-        //在异步里或者子线程里无法获取RequestContextHolder.getRequestAttributes()
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        SysLog sysLog = new SysLog();
-        sysLog.setAction(action);
-        sysLog.setEvent(event);
-        sysLog.setHost(NetworkUtils.getIpAddress(request));
-        sysLog.setUserName((String)request.getSession().getAttribute("userName"));
-        sysLog.setInsertTime(LocalDateTime.now());
-        save(sysLog);
-    }
-
-    @Async
-    @Override
-    public void save(SysLog sysLog) {
+        long start = System.currentTimeMillis();
+        try {
+            Thread.sleep(3000);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         sysLogRepository.save(sysLog);
-        logger.info("异步日志入库完成："+sysLog);
+        long end = System.currentTimeMillis();
+        logger.info("异步日志入库完成，耗时："+(end-start)+"毫秒，入库内容："+sysLog);
     }
 
     @Override

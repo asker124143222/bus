@@ -1,6 +1,8 @@
 package com.home.bus.controller;
 
 import com.google.code.kaptcha.impl.DefaultKaptcha;
+import com.home.bus.entity.SysLog;
+import com.home.bus.factory.LogFactory;
 import com.home.bus.model.LoginResult;
 import com.home.bus.service.LogService;
 import com.home.bus.service.LoginService;
@@ -128,7 +130,8 @@ public class HomeController {
         LoginResult loginResult = loginService.login(userName, password);
         if (loginResult.isLogin()) {
             map.put("userName", userName);
-            logService.writeLog("登录","登录成功");
+            SysLog sysLog = LogFactory.createSysLog("登录","登录成功");
+            logService.writeLog(sysLog);
             return "/index";
         } else {
             map.put("msg", loginResult.getResult());
@@ -139,8 +142,10 @@ public class HomeController {
 
     @RequestMapping("/logout")
     public String logOut(HttpSession session) {
+        SysLog sysLog = LogFactory.createSysLog("logout","登出");
+        logService.writeLog(sysLog);
+
         loginService.logout();
-        logService.writeLog("logout","成功");
         return "/user/login";
     }
 

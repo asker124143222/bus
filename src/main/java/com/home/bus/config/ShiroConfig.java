@@ -5,12 +5,14 @@ import com.home.bus.redis_shiro.RedisCacheManager;
 import com.home.bus.redis_shiro.RedisSessionDAO;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.cache.CacheType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
@@ -23,11 +25,11 @@ import java.util.Properties;
 @Configuration
 public class ShiroConfig {
 
-    @Value("${spring.cache.time-to-live}")
-    private int timeToLive;
-
     @Resource
     private RedisCacheManager redisCacheManager;
+
+    @Resource
+    private CommonCacheConfig cacheConfig;
 
     @Bean
     public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager) {
@@ -97,10 +99,13 @@ public class ShiroConfig {
     @Bean
     public SecurityManager securityManager() {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        // 自定义缓存实现 使用redis
-        securityManager.setCacheManager(redisCacheManager);
-        // 自定义session管理 使用redis
+        if(cacheConfig.isCacheEnable() && cacheConfig.isRedisShiroEnable())
+        {
+            // 自定义缓存实现 使用redis
+            securityManager.setCacheManager(redisCacheManager);
+            // 自定义session管理 使用redis
 //        securityManager.setSessionManager(sessionManager());
+        }
         //自定义realm
         securityManager.setRealm(myShiroRealm());
 
@@ -157,8 +162,11 @@ public class ShiroConfig {
         sessionManager.setSessionIdCookie(cookie());
         sessionManager.setSessionIdCookieEnabled(true);
 
-        sessionManager.setCacheManager(redisCacheManager);
-        sessionManager.setSessionDAO(redisSessionDAO());
+        if(cacheConfig.isCacheEnable() && cacheConfig.isRedisShiroEnable())
+        {
+            sessionManager.setCacheManager(redisCacheManager);
+            sessionManager.setSessionDAO(redisSessionDAO());
+        }
         return sessionManager;
     }
 
@@ -167,10 +175,10 @@ public class ShiroConfig {
      * Shiro生命周期处理器，据说有bug，至少在与springcache集成的时候已经验证
      * 需要单独用一个configure来定义，或者直接注释
      */
-//    @Bean
-//    public LifecycleBeanPostProcessor getLifecycleBeanPostProcessor() {
-//        return new LifecycleBeanPostProcessor();
-//    }
+    @Bean
+    public static LifecycleBeanPostProcessor getLifecycleBeanPostProcessor() {
+        return new LifecycleBeanPostProcessor();
+    }
 
     //加入shiro方言
     @Bean

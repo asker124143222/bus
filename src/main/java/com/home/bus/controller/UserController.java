@@ -2,6 +2,7 @@ package com.home.bus.controller;
 
 
 import com.home.bus.entity.User;
+import com.home.bus.factory.LogFactory;
 import com.home.bus.model.IUserRole;
 import com.home.bus.service.LogService;
 import com.home.bus.service.LoginService;
@@ -141,7 +142,7 @@ public class UserController {
         }
         try {
             userService.save(user);
-            logService.writeLog("新增或修改用户","用户："+user.getUserName());
+            logService.writeLog(LogFactory.createSysLog("新增或修改用户","用户："+user.getUserName()));
             return "/user/ulist";
         }catch (Exception e)
         {
@@ -204,7 +205,7 @@ public class UserController {
             userService.deleteAllUserByUserIdList(idList);
             map.put("success","true");
             map.put("url","/user/ulist");
-            logService.writeLog("删除用户","用户id："+userIdList);
+            logService.writeLog(LogFactory.createSysLog("删除用户","用户id："+userIdList));
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -267,7 +268,7 @@ public class UserController {
                 userService.deleteAllUserRoleByUserId(userId);
                 map.put("success","true");
                 map.put("url","/user/ulist");
-                logService.writeLog("角色清除","用户ID："+userId);
+                logService.writeLog(LogFactory.createSysLog("角色清除","用户ID："+userId));
                 return map;
             }catch (Exception e)
             {
@@ -288,7 +289,7 @@ public class UserController {
             userService.grantUserRole(userId,idList);
             map.put("sucess","true");
             map.put("url","/user/ulist");
-            logService.writeLog("角色分配","用户ID："+userId+" 角色id列表："+roleIdList);
+            logService.writeLog(LogFactory.createSysLog("角色分配","用户ID："+userId+" 角色id列表："+roleIdList));
 
             return map;
         }catch (Exception e)
@@ -366,7 +367,7 @@ public class UserController {
         map.put("success","true");
         map.put("result","密码修改成功，请重新登录");
         map.put("url","/logout");
-        logService.writeLog("修改密码","成功");
+        logService.writeLog(LogFactory.createSysLog("修改密码","成功"));
         return map;
     }
 

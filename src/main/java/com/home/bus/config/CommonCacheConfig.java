@@ -1,6 +1,7 @@
 package com.home.bus.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.cache.CacheType;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -16,6 +17,10 @@ public class CommonCacheConfig {
     @Value("${spring.cache.time-to-live}")
     private long timeToLive;
 
+    @Value("${spring.cache.redis-shiro}")
+    private boolean redisShiroEnable;
+
+
     public boolean isCacheEnable() {
         return cacheEnable;
     }
@@ -30,5 +35,13 @@ public class CommonCacheConfig {
 
     public void setTimeToLive(long timeToLive) {
         this.timeToLive = timeToLive;
+    }
+
+    public boolean isRedisShiroEnable() {
+        return redisShiroEnable;
+    }
+
+    public void setRedisShiroEnable(boolean redisShiroEnable) {
+        this.redisShiroEnable = redisShiroEnable;
     }
 }

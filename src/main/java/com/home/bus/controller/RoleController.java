@@ -1,6 +1,8 @@
 package com.home.bus.controller;
 
+import com.home.bus.entity.SysLog;
 import com.home.bus.entity.SysRole;
+import com.home.bus.factory.LogFactory;
 import com.home.bus.model.ISysRolePermission;
 import com.home.bus.service.LogService;
 import com.home.bus.service.RoleService;
@@ -120,7 +122,9 @@ public class RoleController {
             sysRole.setCreateTime(LocalDateTime.now());
         try {
             roleService.save(sysRole);
-            logService.writeLog("操作角色（新增或修改）","角色："+sysRole.getRole());
+            SysLog sysLog = LogFactory.createSysLog("操作角色（新增或修改）","角色："+sysRole.getRole());
+            logService.writeLog(sysLog);
+
             return  "/user/rlist";
         }catch (Exception e)
         {
@@ -182,7 +186,8 @@ public class RoleController {
         {
             map.put("success","true");
             map.put("url","/user/rlist");
-            logService.writeLog("删除角色","角色id："+roleIdList);
+
+            logService.writeLog(LogFactory.createSysLog("删除角色","角色id："+roleIdList));
         }
         else
         {
@@ -240,7 +245,7 @@ public class RoleController {
                 roleService.clearAuthorization(roleId);
                 map.put("success","true");
                 map.put("url","/user/rlist");
-                logService.writeLog("清除角色权限","成功");
+                logService.writeLog(LogFactory.createSysLog("清除角色权限","成功"));
                 return map;
             }catch (Exception e)
             {
@@ -261,7 +266,7 @@ public class RoleController {
             roleService.grantAuthorization(roleId,idList);
             map.put("sucess","true");
             map.put("url","/user/rlist");
-            logService.writeLog("角色授权","权限列表："+permissionIdList);
+            logService.writeLog(LogFactory.createSysLog("角色授权","权限列表："+permissionIdList));
             return map;
         }catch (Exception e)
         {

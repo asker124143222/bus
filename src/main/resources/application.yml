@@ -26,7 +26,8 @@ spring:
 
   cache:
     time-to-live : 3600 #缓存过期时间
-    cache-enable : true #是否启用缓存
+    cache-enable : false  #是否启用缓存
+    redis-shiro: true  #是否启用redis缓存shiro， cache-enable为true的时候起作用
 #     如果开启缓存@EnableCaching 默认的缓存是springboot的SimpleCache
 #     如果引入redis等缓存后，就会用引入的缓存框架，如果不想用可以强制type:simple
 #    type: simple
