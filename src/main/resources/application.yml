@@ -44,6 +44,22 @@ spring:
         max-wait: 10000
     database: 0
 
+  mqconfig:
+    mq-enable: false #是否启用消息中间件
+
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      bootstrap-servers: 192.168.31.10:9092,192.168.31.10:9093,192.168.31.10:9094
+    bootstrap-servers: 192.168.31.10:9092,192.168.31.10:9093,192.168.31.10:9094
+    topic:
+      Name: home.bus.log
+      numPartitions: 2
+      replicationFactor: 2
+
+
+
 
 
 

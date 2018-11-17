@@ -46,12 +46,12 @@ public class LogServiceImpl implements LogService {
     public void writeLog(SysLog sysLog)
     {
         long start = System.currentTimeMillis();
-        try {
-            Thread.sleep(3000);
-        }catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(3000);
+//        }catch (Exception e)
+//        {
+//            e.printStackTrace();
+//        }
         sysLogRepository.save(sysLog);
         long end = System.currentTimeMillis();
         logger.info("异步日志入库完成，耗时："+(end-start)+"毫秒，入库内容："+sysLog);
