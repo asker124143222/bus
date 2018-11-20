@@ -1,5 +1,7 @@
 package com.home.bus.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.home.bus.entity.mq.MQMessage;
 import com.home.bus.service.MQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,14 @@ public class KafkaServiceImpl implements MQService {
     @Resource
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    public boolean isMqEnable() {
+        return mqEnable;
+    }
+
+    public void setMqEnable(boolean mqEnable) {
+        this.mqEnable = mqEnable;
+    }
+
     @Override
     @Async("logThread")
     public void sendMessage(String msg) {
@@ -37,14 +47,6 @@ public class KafkaServiceImpl implements MQService {
         kafkaTemplate.send(topicName,msg);
         long end = System.currentTimeMillis();
         logger.info("写入kafka，耗时："+(end-start)+"毫秒");
-
     }
 
-    public boolean isMqEnable() {
-        return mqEnable;
-    }
-
-    public void setMqEnable(boolean mqEnable) {
-        this.mqEnable = mqEnable;
-    }
 }

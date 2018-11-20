@@ -43,9 +43,9 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic bar() {
+    public NewTopic myTopic() {
         if(!mqEnable) return null;
-        //第三个参数是副本数量，确保集群中有三个以上server
+        //第三个参数是副本数量，确保集群中配置的数目大于等于副本数量
         return new NewTopic(topicName, numPartitions, (short) replicationFactor);
     }
 

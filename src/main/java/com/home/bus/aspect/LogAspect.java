@@ -1,5 +1,7 @@
 package com.home.bus.aspect;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.home.bus.entity.mq.MQMessage;
 import com.home.bus.service.MQService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -29,10 +31,27 @@ public class LogAspect {
     @Resource(name="kafkaServiceImpl")
     private MQService mqService;
 
+    private ObjectMapper mapper = new ObjectMapper();
+
     @Pointcut("execution(public * com.home.bus.controller.*.*(..))")
     public void log()
     {
     }
+
+    private void sendMessage(String msg)
+    {
+        MQMessage mqMessage = new MQMessage();
+        mqMessage.setMessageId(System.currentTimeMillis());
+        mqMessage.setSendTime(LocalDateTime.now());
+        mqMessage.setMsg(msg);
+        try {
+            mqService.sendMessage(mapper.writeValueAsString(mqMessage));
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 
     @Before("log()")
     public void doBefore(JoinPoint joinPoint)
@@ -48,7 +67,7 @@ public class LogAspect {
         stringBuilder.append(",args:"+ joinPoint.getArgs());
 
         logger.info(stringBuilder.toString());
-        mqService.sendMessage(stringBuilder.toString());
+        sendMessage(stringBuilder.toString());
     }
 
     @After("log()")
@@ -58,7 +77,7 @@ public class LogAspect {
                 +",method: "+joinPoint.getSignature().getName()+",args: "+Arrays.toString(joinPoint.getArgs());
 
         logger.info(msg);
-        mqService.sendMessage(msg);
+        sendMessage(msg);
     }
 
     @AfterReturning(pointcut = "log()",returning = "result")
@@ -66,7 +85,7 @@ public class LogAspect {
     {
         String msg = "方法返回:"+result;
         logger.info(msg);
-        mqService.sendMessage(msg);
+        sendMessage(msg);
     }
 
 }
