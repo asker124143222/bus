@@ -1,6 +1,7 @@
 package com.home.bus.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.home.bus.config.MQConfig;
 import com.home.bus.entity.mq.MQMessage;
 import com.home.bus.service.MQService;
 import org.slf4j.Logger;
@@ -20,31 +21,20 @@ import javax.annotation.Resource;
 @Service
 public class KafkaServiceImpl implements MQService {
 
-    @Value("${spring.mqconfig.mq-enable}")
-    private boolean mqEnable;
-
-    @Value("${spring.kafka.topic.Name}")
-    private String topicName;
+    @Resource
+    private MQConfig mqConfig;
 
     private Logger logger = LoggerFactory.getLogger(KafkaServiceImpl.class);
 
     @Resource
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    public boolean isMqEnable() {
-        return mqEnable;
-    }
-
-    public void setMqEnable(boolean mqEnable) {
-        this.mqEnable = mqEnable;
-    }
-
     @Override
     @Async("logThread")
     public void sendMessage(String msg) {
-        if(!isMqEnable()) return;
+        if(!mqConfig.isMqEnable()) return;
         long start = System.currentTimeMillis();
-        kafkaTemplate.send(topicName,msg);
+        kafkaTemplate.send(mqConfig.getTopicName(),msg);
         long end = System.currentTimeMillis();
         logger.info("写入kafka，耗时："+(end-start)+"毫秒");
     }

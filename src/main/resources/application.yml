@@ -45,16 +45,16 @@ spring:
     database: 0
 
   mqconfig:
-    mq-enable: true #是否启用消息中间件
+    mq-enable: false #是否启用消息中间件
 
-  kafka:
+  #kafka:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
       bootstrap-servers: 192.168.31.10:9092,192.168.31.10:9093,192.168.31.10:9094
     bootstrap-servers: 192.168.31.10:9092,192.168.31.10:9093,192.168.31.10:9094
     topic:
-      Name: home.bus.log #自定义topic名称
+      Name: home.bus.log2 #自定义topic名称
       numPartitions: 2  #自定义分区
       replicationFactor: 2 #自定义副本
     consumer:
