@@ -6,9 +6,12 @@ import com.home.bus.factory.LogFactory;
 import com.home.bus.model.LoginResult;
 import com.home.bus.service.LogService;
 import com.home.bus.service.LoginService;
+import com.home.bus.utils.AesUtils;
+import com.home.bus.utils.RandomUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -18,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,6 +41,11 @@ public class HomeController {
     LogService logService;
 
     private long verifyTTL = 60;//验证码过期时间60秒
+
+    private String create16String()
+    {
+        return RandomUtils.generateString(16);
+    }
 
     @RequestMapping({"/", "/index"})
     public String index() {
@@ -92,39 +101,53 @@ public class HomeController {
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String toLogin(Map<String, Object> map, HttpServletRequest request) {
         loginService.logout();
+        String key = create16String();
+        map.put("key",key);
         return "/user/login";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(Map<String, Object> map, HttpServletRequest request) throws Exception {
+    @ResponseBody
+    public Object login(HttpServletRequest request) throws Exception {
         System.out.println("login()");
+        Map<String, Object> map = new HashMap<>();
         String userName = request.getParameter("userName");
-        String password = request.getParameter("password");
+        String encryptedPassword = request.getParameter("password");
+        String key = request.getParameter("key");
 
         String verifyCode = request.getParameter("verifyCode");
         String rightCode = (String) request.getSession().getAttribute("verifyCode");
         Long verifyCodeTTL = (Long) request.getSession().getAttribute("verifyCodeTTL");
 
+        String password = AesUtils.decrypt(encryptedPassword,key);
+
         Long currentMillis = System.currentTimeMillis();
         if (rightCode == null || verifyCodeTTL == null) {
             map.put("msg", "请刷新图片，输入验证码！");
             map.put("userName", userName);
-            map.put("password", password);
-            return "/user/login";
+//            map.put("password", password);
+            map.put("success",false);
+            map.put("url","/user/login");
+            return map;
         }
         Long expiredTime = (currentMillis - verifyCodeTTL) / 1000;
         if (expiredTime > this.verifyTTL) {
             map.put("msg", "验证码过期，请刷新图片重新输入！");
             map.put("userName", userName);
-            map.put("password", password);
-            return "/user/login";
+//            map.put("password", password);
+            map.put("success",false);
+            map.put("url","/user/login");
+            return map;
         }
 
         if (!verifyCode.equalsIgnoreCase(rightCode)) {
             map.put("msg", "验证码错误，请刷新图片重新输入！");
             map.put("userName", userName);
-            map.put("password", password);
-            return "/user/login";
+//            map.put("password", password);
+            map.put("success",false);
+            map.put("url","/user/login");
+            return map;
+//            return "/user/login";
         }
 
         LoginResult loginResult = loginService.login(userName, password);
@@ -132,11 +155,18 @@ public class HomeController {
             map.put("userName", userName);
             SysLog sysLog = LogFactory.createSysLog("登录","登录成功");
             logService.writeLog(sysLog);
-            return "/index";
+            map.put("success",true);
+            map.put("url","/index");
+            return map;
+//            return "/index";
         } else {
             map.put("msg", loginResult.getResult());
             map.put("userName", userName);
-            return "/user/login";
+//            map.put("password", password);
+            map.put("success",false);
+            map.put("url","/user/login");
+            return map;
+//            return "/user/login";
         }
     }
 

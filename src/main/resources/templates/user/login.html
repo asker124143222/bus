@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.w3.org/1999/xhtml">
+      xmlns:th="http://www.w3.org/1999/xhtml"
+>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,42 +10,49 @@
 
     <script src="../../static/js/jquery-3.3.1.min.js" th:src="@{/js/jquery-3.3.1.min.js}"></script>
     <script src="../../static/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+    <script src="../../static/js/crypto-js.js" th:src="@{/js/crypto-js.js}"></script>
+
+
     <title>用户登录</title>
 
     <style>
-        .bgColor{
-            background-color:rgba(243,66,111,0.15)
+        .bgColor {
+            background-color: rgba(243, 66, 111, 0.15)
         }
-        .divBorder{
-            border: solid 1px rgba(12,24,255,0.15);
+
+        .divBorder {
+            border: solid 1px rgba(12, 24, 255, 0.15);
             padding: 10px;
             margin-top: 10px;
             border-radius: 10px;
             text-align: center;
             vertical-align: middle;
         }
-        .h4font{
+
+        .h4font {
             margin-top: 0px;
             font-family: 微软雅黑;
             font-weight: 500;
         }
 
         .center {
-           padding: 20% 0;
+            padding: 20% 0;
         }
-        .verifyInput{
-            vertical-align:middle;
+
+        .verifyInput {
+            vertical-align: middle;
             font-size: 14px;
             font-weight: normal;
             line-height: 1;
             /*border:1px solid #999;*/
             float: left;
-            width:180px;
-            height:30px;
+            width: 180px;
+            height: 30px;
 
         }
-        .verifyImage{
-            vertical-align:middle;
+
+        .verifyImage {
+            vertical-align: middle;
             float: right;
             height: 30px;
         }
@@ -61,26 +69,31 @@
             <h3 class="panel panel-heading h4font">
                 用户登录
             </h3>
-            <h4 th:text="${msg}"></h4>
-            <form class="form-horizontal" th:action="@{/login}" method="post">
+            <h4 name="msg" th:text="${msg}"></h4>
+            <input type="hidden" name="key" th:value="${key}">
+            <!--<form class="form-horizontal" th:action="@{/login}" method="post">-->
+            <form class="form-horizontal" method="post">
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-user" aria-hidden="true"></i></span>
-                    <input type="text" class="form-control" name="userName" placeholder="请输入用户名称" th:value="${userName}"/>
+                    <input type="text" class="form-control" name="userName" placeholder="请输入用户名称"
+                           th:value="${userName}"/>
                 </div>
                 <br>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    <input type="password" class="form-control" name="password" th:value="${password}" placeholder="请输入密码"/>
+                    <input type="password" class="form-control" name="password" th:value="${password}"
+                           placeholder="请输入密码"/>
                 </div>
                 <br/>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-font"></i></span>
-                    <input type="text"class="verifyInput" name="verifyCode" placeholder="验证码"/>
-                    <img class="verifyImage"  alt="验证码" onclick="this.src='/getVerifyCode?d='+new Date()*1" src="/getVerifyCode">
+                    <input type="text" class="verifyInput" name="verifyCode" placeholder="验证码"/>
+                    <img class="verifyImage" alt="验证码" onclick="this.src='/getVerifyCode?d='+new Date()*1"
+                         src="/getVerifyCode">
                 </div>
 
                 <br>
-                <input type="submit" class="btn btn-lg btn-block btn-info" value="登 录">
+                <input type="button" name="btnLogin" class="btn btn-lg btn-block btn-info" value="登 录">
             </form>
         </div>
 
@@ -88,8 +101,66 @@
     </div>
 
 </div>
+<script th:inline="javascript">
+    $(function () {
+        $('input[name="btnLogin"]').click(function () {
+            var $key = $('input[name="key"]').val();
+            var $userName = $('input[name="userName"]').val();
+            var $password = $('input[name="password"]').val();
+            var $verifyCode = $('input[name="verifyCode"]').val();
+//            console.log($userName + ",  " + $password + ", " + $verifyCode + ", " + $key);
+            if ($userName == "" || $password == "" || $verifyCode == "") {
+                alert("用户名、密码、验证码不能为空！");
+                return false;
+            }
+
+            var key = CryptoJS.enc.Utf8.parse($key);
+//            console.log("key:" + key + ",$key:" + $key);
+            var password = CryptoJS.enc.Utf8.parse($password);
+            var encrypted = CryptoJS.AES.encrypt(password, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7});
+            var encryptedPwd = encrypted.toString();
+
+//            console.log("encrypted:" + encrypted);
+//            console.log("encryptedPwd:" + encryptedPwd);
+
+            var decrypt = CryptoJS.AES.decrypt(encryptedPwd, key, {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            var testDecryptStr = CryptoJS.enc.Utf8.stringify(decrypt).toString();
+
+//            console.log("decrypt:" + decrypt);
+//            console.log("testDecryptStr:" + testDecryptStr);
 
 
+            $.ajax({
+                type: "post",
+                url: "/login",
+                data: {userName: $userName, password: encryptedPwd, verifyCode: $verifyCode, key: $key},
+                dataType: "json",
+                success: function (result) {
+//                    console.log(result);
+                    if(result.success)
+                    {
+                        window.location.href=result.url;
+                    }
+                    else
+                    {
+                        $('h4[name="msg"]').html(result.msg);
+                        alert(result.msg);
+                    }
+//                    window.location.replace(result.url);
+//                    $('#container').load(result.url);
+                },
+                error: function (result) {
+//                        console.log(result);
+                    alert(result.responseText);
+                }
+            });
+
+        })
+    })
+</script>
 
 
 </body>
