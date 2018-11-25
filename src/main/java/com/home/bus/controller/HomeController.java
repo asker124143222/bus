@@ -42,6 +42,8 @@ public class HomeController {
 
     private long verifyTTL = 60;//验证码过期时间60秒
 
+    private char[] key16;
+
     private String create16String()
     {
         return RandomUtils.generateString(16);
@@ -102,6 +104,7 @@ public class HomeController {
     public String toLogin(Map<String, Object> map, HttpServletRequest request) {
         loginService.logout();
         String key = create16String();
+        key16 = key.toCharArray();
         map.put("key",key);
         return "/user/login";
     }
@@ -113,7 +116,9 @@ public class HomeController {
         Map<String, Object> map = new HashMap<>();
         String userName = request.getParameter("userName");
         String encryptedPassword = request.getParameter("password");
-        String key = request.getParameter("key");
+//        String key = request.getParameter("key");
+        String key = new String(key16);
+
 
         String verifyCode = request.getParameter("verifyCode");
         String rightCode = (String) request.getSession().getAttribute("verifyCode");

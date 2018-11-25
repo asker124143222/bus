@@ -103,6 +103,7 @@
 </div>
 <script th:inline="javascript">
     $(function () {
+        console.log($('input[name="key"]').val());
         $('input[name="btnLogin"]').click(function () {
             var $key = $('input[name="key"]').val();
             var $userName = $('input[name="userName"]').val();
@@ -115,7 +116,7 @@
             }
 
             var key = CryptoJS.enc.Utf8.parse($key);
-//            console.log("key:" + key + ",$key:" + $key);
+            console.log("key:" + key + ",$key:" + $key);
             var password = CryptoJS.enc.Utf8.parse($password);
             var encrypted = CryptoJS.AES.encrypt(password, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7});
             var encryptedPwd = encrypted.toString();
@@ -136,7 +137,8 @@
             $.ajax({
                 type: "post",
                 url: "/login",
-                data: {userName: $userName, password: encryptedPwd, verifyCode: $verifyCode, key: $key},
+//                data: {userName: $userName, password: encryptedPwd, verifyCode: $verifyCode, key: $key},
+                data: {userName: $userName, password: encryptedPwd, verifyCode: $verifyCode},
                 dataType: "json",
                 success: function (result) {
 //                    console.log(result);
