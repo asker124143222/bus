@@ -137,8 +137,8 @@
             $.ajax({
                 type: "post",
                 url: "/login",
-//                data: {userName: $userName, password: encryptedPwd, verifyCode: $verifyCode, key: $key},
-                data: {userName: $userName, password: encryptedPwd, verifyCode: $verifyCode},
+                data: {userName: $userName, password: encryptedPwd, verifyCode: $verifyCode, key: $key},
+//                data: {userName: $userName, password: encryptedPwd, verifyCode: $verifyCode},
                 dataType: "json",
                 success: function (result) {
 //                    console.log(result);

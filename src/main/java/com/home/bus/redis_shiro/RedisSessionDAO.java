@@ -16,7 +16,6 @@ import java.io.Serializable;
  * @Date: 2018/11/4 20:42
  * @Description:redis实现共享session
  */
-@Component
 public class RedisSessionDAO extends CachingSessionDAO {
     private Logger logger = LoggerFactory.getLogger(RedisSessionDAO.class);
 //    private String prefix = getActiveSessionsCacheName();
