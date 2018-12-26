@@ -130,6 +130,20 @@
 			<artifactId>spring-kafka</artifactId>
 			<version>2.1.2.RELEASE</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-high-level-client</artifactId>
+			<version>6.5.1</version>
+		</dependency>
+
+		<!--如果不指定，springboot会自动引入5.x版本,所以需要强行引入高版本，
+		    elasticsearch-rest-client版本是同步，不需要强行指定-->
+		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
+			<version>6.5.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

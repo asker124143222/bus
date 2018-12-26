@@ -65,6 +65,9 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
+elasticsearch:
+  ip: 192.168.31.10:9200,192.168.1.101:9200
+
 
 
 
