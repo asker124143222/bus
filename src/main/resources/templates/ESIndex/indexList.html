@@ -120,7 +120,7 @@
     $(function () {
         $table.bootstrapTable({
 //            url: /*[[@{user/role}]]*/ null,        //请求后台的URL（*）
-            url:"/user/getUserList",        //请求后台的URL（*）
+            url:"/es/getIndexList",        //请求后台的URL（*）
             method: 'post',                      //请求方式（*）
             contentType : "application/x-www-form-urlencoded;charset=UTF-8", //post方式必须设置,get方式设置application/json
             dataType: 'json',
@@ -140,10 +140,10 @@
 //            showToggle:true,                    //是否显示详细视图和列表视图的切换按钮
             sortable: true,                     //是否启用排序
             sortOrder: "desc",                   //排序方式
-            sortName: 'createTime',
+            sortName: 'cds',
             cardView: false,                    //是否显示详细视图
             detailView: false,                  //是否显示父子表
-            idField: 'userId',
+            idField: 'uuid',
             showExport: true,                     //是否显示导出
             exportDataType: "selected",              //basic', 'all', 'selected'.
             exportTypes: ['txt','csv', 'excel','xlsx'],
@@ -179,46 +179,37 @@
                         return options.pageSize * (options.pageNumber - 1) + index + 1;
                     }
                 }, {
-                    field: 'userName',
-                    title: '用户名称',
+                    field: 'index',
+                    title: '索引名称',
                     sortable: true
                 }, {
-                    field: 'name',
-                    title: '昵称'
+                    field: 'health',
+                    title: '健康度'
                 },{
-                    field: 'tel',
-                    title: '电话'
+                    field: 'status',
+                    title: '状态',
+                    formatter:function (value,row,index) {
+                        if(value == 'close') return "关闭";
+                        else if(value =='open' ) return "正常";
+                        else return "禁用";
+                    }
                 },{
-                    field: 'email',
-                    title: '邮箱'
+                    field: 'docsCount',
+                    title: '文档数',
+                    sortable: true
                 },{
-                    field: 'createTime',
+                    field: 'storeSize',
+                    title: '存储',
+                    sortable:true
+                },{
+                    field: 'cds',
                     title: '创建时间',
                     sortable: true
 //                    formatter:function (value,row,index) {
 //                        return  createTimeFormat(value);
 //                    }
 
-                }, {
-                    field: 'expiredDate',
-                    title: '过期时间',
-                    sortable: true
-//                    formatter:function (value,row,index) {
-//                        return  expiredDateFormat(value);
-//                    }
-
-                }, {
-                    field: 'state',
-                    title: '状态',
-                    sortable: true,
-                    formatter:function (value,row,index) {
-                        if(row.userName=='admin') return "锁定";
-                        if(value == 0) return "未认证";
-                        else if(value ==1 ) return "正常";
-                        else return "禁用";
-                    }
                 }
-
             ],
             queryParamsType: '',
             queryParams: function (params) {
@@ -236,7 +227,7 @@
             rowStyle: function (row, index) {
                 //这里有5个取值代表5中颜色['active', 'success', 'info', 'warning', 'danger'];
                 var strclass = "";
-                if (row.role == "admin") {
+                if (row.status == "close") {
                     strclass = 'danger';//
                 }
                 else {
@@ -245,10 +236,10 @@
                 return { classes: strclass }
             },
             onLoadSuccess: function () {
-                console.log("用户数据加载成功！");
+                console.log("index数据加载成功！");
             },
             onLoadError: function () {
-                console.log("用户数据加载失败！");
+                console.log("index数据加载失败！");
             },
             onDblClickRow: function (row, $element) {
 

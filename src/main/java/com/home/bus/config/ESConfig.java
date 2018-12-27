@@ -20,7 +20,7 @@ import java.util.Objects;
  * @Date: 2018/12/26 15:50
  * @Description: elasticsearch rest client config
  */
-//@Configuration
+@Configuration
 public class ESConfig {
     private Logger logger = LoggerFactory.getLogger(ESConfig.class);
     private static final int ADDRESS_LENGTH = 2;
@@ -42,6 +42,10 @@ public class ESConfig {
         return RestClient.builder(hosts);
     }
 
+    @Bean
+    public RestClient restClient(){
+        return restClientBuilder().build();
+    }
 
     @Bean(name = "highLevelClient")
     public RestHighLevelClient highLevelClient(@Autowired RestClientBuilder restClientBuilder) {
