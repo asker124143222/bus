@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,33 +37,37 @@ public class ESController {
     @ResponseBody
     public Object getESIndexList(HttpServletRequest request)
     {
-        int pageSize = 10;
-        try {
-            pageSize = Integer.parseInt(request.getParameter("pageSize"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        int pageNumber = 0;
-        try {
-            pageNumber = Integer.parseInt(request.getParameter("pageNumber")) - 1;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        无法有效的在server端分页，把分页挪到client端
+//        int pageSize = 10;
+//        try {
+//            pageSize = Integer.parseInt(request.getParameter("pageSize"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        int pageNumber = 0;
+//        try {
+//            pageNumber = Integer.parseInt(request.getParameter("pageNumber")) - 1;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         String searchText = request.getParameter("searchText") == null ? "" : request.getParameter("searchText");
-        String sortName = request.getParameter("sortName") == null ? "roleId" : request.getParameter("sortName");
-        String sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+//        String sortName = request.getParameter("sortName") == null ? "roleId" : request.getParameter("sortName");
+//        String sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+//
+//        Sort sortLocal = new Sort(sortOrder.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortName);
+//        Pageable pageable = PageRequest.of(pageNumber, pageSize, sortLocal);
+//
+//        Map<String, Object> map = new HashMap<>();
+//        Page<ESIndexObject> page = esIndexService.getAllESIndex(pageable);
+//
+//        map.put("total", page.getTotalElements());
+//        map.put("rows", page.getContent());
 
-        Sort sortLocal = new Sort(sortOrder.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortName);
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sortLocal);
-
-        Map<String, Object> map = new HashMap<>();
-        Page<ESIndexObject> page = esIndexService.getAllESIndex(pageable);
-
-        map.put("total", page.getTotalElements());
-        map.put("rows", page.getContent());
-
-        return map;
+//        return map;
+//        List<ESIndexObject> list = esIndexService.getAllESIndex();
+        List<ESIndexObject> list = esIndexService.getESIndexByName(searchText);
+        return list;
     }
 }

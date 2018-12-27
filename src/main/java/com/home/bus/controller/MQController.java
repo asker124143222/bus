@@ -62,6 +62,7 @@ public class MQController {
         Sort sortLocal = new Sort(sortOrder.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortName);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sortLocal);
 
+        //分页有问题，暂时没时间折腾,PageImpl第一个参数应该是当前页的容，最后一个参数应该是总的记录数，这里没传对。
         Page<MQMessage> mqMessagePage = new PageImpl<MQMessage>(mqConsumerService.getMessage(),pageable,this.mqConsumerService.getMessage().size());
         map.put("total", mqMessagePage.getTotalElements());
         map.put("rows", mqMessagePage.getContent());
