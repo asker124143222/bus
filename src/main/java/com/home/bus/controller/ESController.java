@@ -1,6 +1,8 @@
 package com.home.bus.controller;
 
+import com.home.bus.entity.esIndex.ESCustomer;
 import com.home.bus.entity.esIndex.ESIndexObject;
+import com.home.bus.service.ESCustomerService;
 import com.home.bus.service.ESIndexService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +29,8 @@ public class ESController {
 
     @Resource
     ESIndexService esIndexService;
+    @Resource
+    ESCustomerService esCustomerService;
 
     @RequestMapping(value = "/list")
     public String list() {
@@ -68,6 +72,7 @@ public class ESController {
 //        return map;
 //        List<ESIndexObject> list = esIndexService.getAllESIndex();
         List<ESIndexObject> list = esIndexService.getESIndexByName(searchText);
+      //  List<ESCustomer> esCustomers = esCustomerService.searchByName("我不是张天宝");
         return list;
     }
 }
