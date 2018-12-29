@@ -1,6 +1,8 @@
 package com.home.bus.service;
 
 import com.home.bus.entity.esIndex.ESCustomer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -10,5 +12,8 @@ import java.util.List;
  * @Description:
  */
 public interface ESCustomerService {
-    List<ESCustomer> searchByName(String name);
+    List<ESCustomer> searchAll();
+    Page<ESCustomer> searchAllInPage(Pageable pageable);
+    Page<ESCustomer> searchAllByMultiMatch(String query,Pageable pageable);
+
 }

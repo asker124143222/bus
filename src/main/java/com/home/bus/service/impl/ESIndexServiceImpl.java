@@ -22,8 +22,7 @@ import java.util.List;
 
 @Service
 public class ESIndexServiceImpl implements ESIndexService {
-    @Resource
-    RestHighLevelClient restHighLevelClient;
+
     @Resource
     RestClient restClient;
 
@@ -37,6 +36,14 @@ public class ESIndexServiceImpl implements ESIndexService {
         Request request = new Request(method.toUpperCase(),query);
         try {
             Response response = restClient.performRequest(request);
+            RequestLine requestLine = response.getRequestLine();
+            HttpHost host = response.getHost();
+            int statusCode = response.getStatusLine().getStatusCode();
+            Header[] headers = response.getHeaders();
+            System.out.println(requestLine);
+            System.out.println(host);
+            System.out.println(statusCode);
+            System.out.println(headers);
             String responseBody = EntityUtils.toString(response.getEntity());
             ObjectMapper mapper = new ObjectMapper();
 
@@ -53,18 +60,6 @@ public class ESIndexServiceImpl implements ESIndexService {
     public List<ESIndexObject> getESIndexByName(String index) {
         if(index==null) index = "";
         String strQuery = "/_cat/indices/*"+index+"*?v&h=uuid,health,status,index,docsCount,storeSize,cds&s=cds:desc&format=json";
-//        Request request = new Request("GET", strQuery);
-//        try {
-//            Response response = restClient.performRequest(request);
-//            String responseBody = EntityUtils.toString(response.getEntity());
-//            ObjectMapper mapper = new ObjectMapper();
-//            List<ESIndexObject> list = mapper.readValue(responseBody,new TypeReference<List<ESIndexObject>>(){});
-//
-//            return list;
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
         List<ESIndexObject> list =  getDataByQuery("GET",strQuery);
         return list;
     }
@@ -79,21 +74,6 @@ public class ESIndexServiceImpl implements ESIndexService {
     @Override
     public Page<ESIndexObject> getAllESIndex(Pageable pageable) {
         String strQuery = "/_cat/indices?v&h=uuid,health,status,index,docsCount,storeSize,cds&s=cds:desc&format=json";
-//        Request request = new Request("GET", strQuery);
-//        try {
-//            Response response = restClient.performRequest(request);
-////            RequestLine requestLine = response.getRequestLine();
-////            HttpHost host = response.getHost();
-////            int statusCode = response.getStatusLine().getStatusCode();
-////            Header[] headers = response.getHeaders();
-//            String responseBody = EntityUtils.toString(response.getEntity());
-//            ObjectMapper mapper = new ObjectMapper();
-//            List<ESIndexObject> list = mapper.readValue(responseBody,new TypeReference<List<ESIndexObject>>(){});
-
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
 
         List<ESIndexObject> list = getDataByQuery("GET",strQuery);
         int totalElements = list.size();

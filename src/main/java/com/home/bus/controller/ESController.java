@@ -29,8 +29,6 @@ public class ESController {
 
     @Resource
     ESIndexService esIndexService;
-    @Resource
-    ESCustomerService esCustomerService;
 
     @RequestMapping(value = "/list")
     public String list() {
@@ -72,7 +70,7 @@ public class ESController {
 //        return map;
 //        List<ESIndexObject> list = esIndexService.getAllESIndex();
         List<ESIndexObject> list = esIndexService.getESIndexByName(searchText);
-      //  List<ESCustomer> esCustomers = esCustomerService.searchByName("我不是张天宝");
+
         return list;
     }
 }
