@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -43,6 +44,27 @@ public class ESCustomerServiceImpl implements ESCustomerService {
 
     private String indexName="customer";
 
+    private <T> List<T> wrapperData(SearchResponse response) throws Exception
+    {
+        SearchHits hits = response.getHits();
+        long totalHits = hits.getTotalHits();
+        System.out.println("Customer search totalHits:"+totalHits);
+        List<T> list = new ArrayList<>();
+        SearchHit[] searchHits = hits.getHits();
+        //SearchHits实现了Iterable接口，可以直接进行迭代
+        //根据测试这里可以用hits变量替换searchHits变量
+        for (SearchHit hit : searchHits) {
+            String index = hit.getIndex(); //获取文档的index
+            String type = hit.getType(); //获取文档的type
+            String id = hit.getId(); //获取文档的id
+            Map<String, Object> sourceMap = hit.getSourceAsMap(); //获取文档内容，封装为map
+            System.out.println("index:"+index+",type:"+type+",id:"+id+",\nsource:"+sourceMap);
+            String sourceString = hit.getSourceAsString(); //获取文档内容，转换为json字符串。
+            T object = mapper.readValue(sourceString,new TypeReference<T>(){});
+            list.add(object);
+        }
+        return list;
+    }
     @Override
     public Page<ESCustomer> searchAllInPage(Pageable pageable) {
         SearchRequest searchRequest = new SearchRequest(indexName);
@@ -54,29 +76,16 @@ public class ESCustomerServiceImpl implements ESCustomerService {
         while (iterator.hasNext())
         {
             Sort.Order order = (Sort.Order) iterator.next();
-            //用keyword来排序
+            //用keyword字段来排序，所以在建立索引的时候，就必须同步建立keyword字段
             builder.sort(order.getProperty()+".keyword",order.getDirection()== Sort.Direction.ASC ? SortOrder.ASC:SortOrder.DESC);
         }
         builder.query(QueryBuilders.matchAllQuery());
         searchRequest.source(builder);
         try {
             SearchResponse searchResponse = restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
-            SearchHits hits = searchResponse.getHits();
-            long totalHits = hits.getTotalHits();
-            System.out.println("Customer search totalHits:"+totalHits);
-            List<ESCustomer> esCustomerList = new ArrayList<ESCustomer>((int)totalHits);
-            SearchHit[] searchHits = hits.getHits();
-            for (SearchHit hit : hits) {
-                String index = hit.getIndex(); //获取文档的index
-                String type = hit.getType(); //获取文档的type
-                String id = hit.getId(); //获取文档的id
-                Map<String, Object> sourceMap = hit.getSourceAsMap(); //获取文档内容，封装为map
-                System.out.println("index:"+index+",type:"+type+",id:"+id+",\nsource:"+sourceMap);
-                String sourceString = hit.getSourceAsString(); //获取文档内容，转换为json字符串。
-                ESCustomer esCustomer = mapper.readValue(sourceString,ESCustomer.class);
-                esCustomerList.add(esCustomer);
-            }
-            Page<ESCustomer> esCustomerPage = new PageImpl<ESCustomer>(esCustomerList,pageable,totalHits);
+
+            List<ESCustomer> esCustomerList = wrapperData(searchResponse);
+            Page<ESCustomer> esCustomerPage = new PageImpl<ESCustomer>(esCustomerList,pageable,searchResponse.getHits().getTotalHits());
             return esCustomerPage;
 
         }catch (Exception e)
@@ -99,24 +108,8 @@ public class ESCustomerServiceImpl implements ESCustomerService {
         searchRequest.source(searchSourceBuilder);
         try {
             SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits hits = searchResponse.getHits();
-            long totalHits = hits.getTotalHits();
-            System.out.println("Customer search totalHits:"+totalHits);
-            List<ESCustomer> esCustomerList = new ArrayList<ESCustomer>((int)totalHits);
-            SearchHit[] searchHits = hits.getHits();
-            for (SearchHit hit : hits) {
-                String index = hit.getIndex(); //获取文档的index
-                String type = hit.getType(); //获取文档的type
-                String id = hit.getId(); //获取文档的id
-                Map<String, Object> sourceMap = hit.getSourceAsMap(); //获取文档内容，封装为map
-                System.out.println("index:"+index+",type:"+type+",id:"+id+",\nsource:"+sourceMap);
-                String sourceString = hit.getSourceAsString(); //获取文档内容，转换为json字符串。
-                ESCustomer esCustomer = mapper.readValue(sourceString,ESCustomer.class);
 
-                esCustomerList.add(esCustomer);
-
-            }
-
+            List<ESCustomer> esCustomerList = wrapperData(searchResponse);
             return esCustomerList;
 
         }catch (Exception e)
@@ -126,6 +119,7 @@ public class ESCustomerServiceImpl implements ESCustomerService {
         }
     }
 
+    // 需要自己实现返回的json数据封装，暂时未实现
     @Deprecated
     public List<ESCustomer> searchByNameByRaw(String name) {
         String query ="{\n" +
