@@ -14,6 +14,6 @@ import java.util.List;
 public interface ESCustomerService {
     List<ESCustomer> searchAll();
     Page<ESCustomer> searchAllInPage(Pageable pageable);
-    Page<ESCustomer> searchAllByMultiMatch(String query,Pageable pageable);
+    Page<ESCustomer> searchAllByAllField(String query,Pageable pageable);
 
 }

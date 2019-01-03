@@ -38,7 +38,8 @@ public class ESCustomerController {
     public Object getESCustomerList(HttpServletRequest request) {
 
         Pageable pageable = ControllerUtils.getPageInfo(request);
-        Page<ESCustomer> page = esCustomerService.searchAllInPage(pageable);
+        String searchText = ControllerUtils.getSearchText(request);
+        Page<ESCustomer> page = esCustomerService.searchAllByAllField(searchText,pageable);
 
         Map<String, Object> map = new HashMap<>();
         map.put("total", page.getTotalElements());
