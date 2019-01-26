@@ -21,12 +21,12 @@ public interface RoleRepository extends JpaRepository<SysRole,Integer> {
     SysRole findSysRoleByRole(String role);
 
     //排除现有角色的情况下，判断新的角色是否存在
-    @Query(value="select * from SysRole where role <> ?1 and role = ?2",nativeQuery = true)
+    @Query(value="select * from sysrole where role <> ?1 and role = ?2",nativeQuery = true)
     SysRole findSysRoleExists2(String oldRole, String newRole);
 
     //根据roleid列表删除所有的角色
     @Modifying
-    @Query(value = "delete from SysRole where roleId in (?1)",nativeQuery = true)
+    @Query(value = "delete from sysrole where roleId in (?1)",nativeQuery = true)
     void deleteAllByRoleIdList(List<Integer> roleIdList);
 
     //根据roleid列出所有权限，包括没有的权限，如果没有权限，则roleid和role两个字段会是null值，可以根据此做业务判断
@@ -41,11 +41,11 @@ public interface RoleRepository extends JpaRepository<SysRole,Integer> {
 
     //根据roleid删除角色权限关联表里所有角色权限
     @Modifying
-    @Query(value = "delete from SysRolePermission where roleId=?1",nativeQuery = true)
+    @Query(value = "delete from sysrolepermission where roleId=?1",nativeQuery = true)
     void deleteRolePermission(Integer roleId);
 
     //插入角色和权限
     @Modifying
-    @Query(value="insert into SysRolePermission(roleId,permissionId) VALUES(?1,?2) ",nativeQuery = true)
+    @Query(value="insert into sysrolepermission(roleId,permissionId) VALUES(?1,?2) ",nativeQuery = true)
     void insertRolePermission(Integer roleId, Integer permissionId);
 }

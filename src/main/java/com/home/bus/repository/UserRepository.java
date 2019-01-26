@@ -33,17 +33,17 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 
     //根据userid删除用户角色关联表里的记录
     @Modifying
-    @Query(value="delete from SysUserRole where userId in (?1)",nativeQuery = true)
+    @Query(value="delete from sysuserrole where userId in (?1)",nativeQuery = true)
     void deleteAllUserRoleByUserIdList(List<Integer> userIdList);
 
     //根据userid删除用户角色关联表里的记录
     @Modifying
-    @Query(value="delete from SysUserRole where userId = ?1",nativeQuery = true)
+    @Query(value="delete from sysuserrole where userId = ?1",nativeQuery = true)
     void deleteAllUserRoleByUserId(Integer userId);
 
     //新增用户和角色关联记录
     @Modifying
-    @Query(value="insert into SysUserRole(userId,roleId) VALUES(?1,?2)",nativeQuery = true)
+    @Query(value="insert into sysuserrole(userId,roleId) VALUES(?1,?2)",nativeQuery = true)
     void insertUserRole(Integer userId, Integer roleId);
 
     //根据用户名获取用户所具备的角色列表
@@ -59,11 +59,11 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     List<IUserRole> findUserRoleByUserName(String userName);
 
     //根据用户id，列出所有角色，包括该用户不具备的角色，该用户不具备角色的时候，userid和username为null，可以做业务判断
-    @Query(value="select a.roleId,a.role,a.description,c.userId,c.userName from SysRole a\n" +
-            "left join SysUserRole b on a.roleId=b.roleId and a.available=1 and b.userId=?1\n" +
+    @Query(value="select a.roleId,a.role,a.description,c.userId,c.userName from sysrole a\n" +
+            "left join sysuserrole b on a.roleId=b.roleId and a.available=1 and b.userId=?1\n" +
             "left join user c on c.userId=b.userId;",
     countQuery = "select count(*) from SysRole a\n" +
-            "left join SysUserRole b on a.roleId=b.roleId and a.available=1 and b.userId=?1\n" +
+            "left join sysuserrole b on a.roleId=b.roleId and a.available=1 and b.userId=?1\n" +
             "left join user c on c.userId=b.userId;",
     nativeQuery = true)
     List<IUserRole> findAllUserRoleByUserId(Integer userId);
@@ -81,5 +81,8 @@ public interface UserRepository extends JpaRepository<User,Integer> {
                     "where a.userName=?1",
             nativeQuery = true)
     List<ISysPermission> findUserRolePermissionByUserName(String userName);
+
+    @Query(value = "select version()",nativeQuery = true)
+    String getDbVersion();
 
 }

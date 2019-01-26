@@ -12,6 +12,7 @@ import java.util.List;
  * @Description:
  */
 @Entity
+@Table(name = "syspermission")
 public class SysPermission implements Serializable {
     private static final long serialVersionUID = -2985090918956872791L;
     @Id

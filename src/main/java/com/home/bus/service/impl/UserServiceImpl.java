@@ -45,6 +45,11 @@ public class UserServiceImpl implements UserService {
     @Resource
     private CommonCacheConfig cacheConfig;
 
+    @Override
+    public String getDbVersion() {
+        return userRepository.getDbVersion();
+    }
+
     private User findByUserNameInCache(String userName) {
         User user;
         String key = keyPrefix + userName;

@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * @Author: xu.dm
@@ -12,6 +13,7 @@ import javax.persistence.Id;
  * @Description:角色权限对照表
  */
 @Entity
+@Table(name = "sysrolepermission")
 public class SysRolePermission {
     @Id
     @GenericGenerator(name="generator",strategy = "native")

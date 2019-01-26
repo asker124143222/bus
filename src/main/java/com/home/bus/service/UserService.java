@@ -16,6 +16,9 @@ import java.util.Optional;
  * @Description:
  */
 public interface UserService {
+
+    String getDbVersion();
+
     User findByUserName(String userName);
 
     User findUserById(Integer userId);

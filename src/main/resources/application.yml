@@ -5,10 +5,14 @@ server:
 
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/busData?characterEncoding=utf8&useSSL=false
-    username: root
-    password: root
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://192.168.31.10:3306/busdata?useUnicode=true&characterEncoding=UTF-8
+    username: bus
+    password: 123@abc.com
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://192.168.31.10:3306/busData?characterEncoding=utf8&useSSL=false
+#    username: root
+#    password: root
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,6 +20,7 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #按字段名字建表
     show-sql: true
     database: mysql
+#    database-platform: org.hibernate.dialect.MariaDBDialect
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
   thymeleaf:

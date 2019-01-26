@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * @Author: xu.dm
@@ -13,6 +14,7 @@ import javax.persistence.Id;
  */
 
 @Entity
+@Table(name = "sysuserrole")
 public class SysUserRole {
     @Id
     @GenericGenerator(name="generator",strategy = "native")

@@ -8,10 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -21,6 +18,7 @@ import java.time.LocalDateTime;
  * @Description:系统日志
  */
 @Entity
+@Table(name = "syslog")
 public class SysLog implements Serializable {
     @Id
     @GenericGenerator(name="generator",strategy = "native")

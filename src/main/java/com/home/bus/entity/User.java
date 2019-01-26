@@ -21,10 +21,15 @@ import java.util.List;
 /**
  * @Author: xu.dm
  * @Date: 2018/6/10 17:14
- * @Description:
+ * @Description: 为什么要使用@Table注解，并且把表名小写？
+ * 是因为mysql数据库在windows环境下会被统一转成小写，
+ * 而为了兼容Mariadb，Mariadb在linux环境下会按实际类名大小写来建表，而linux是大小写敏感，两者之间在迁移的时候就遇到问题。
+ * 这里属于设计上的失误，表名不应该使用驼峰命名，应该统一小写，并使用下划线来分隔语义。
+ * 用户及权限这套表都有次情况，所以使用@Table强行指定表名。
  */
 
 @Entity
+@Table(name = "user")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 5887833463461262508L;

@@ -24,6 +24,7 @@ import java.util.List;
  * @Description:
  */
 @Entity
+@Table(name = "sysrole")
 public class SysRole implements Serializable {
     private static final long serialVersionUID = 8908550596207293603L;
     @Id

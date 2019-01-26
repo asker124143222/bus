@@ -68,6 +68,12 @@
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 
+		<!--加入mariadb-->
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+		</dependency>
+
         <!--与reids缓存冲突-->
 		<!--<dependency>-->
 			<!--<groupId>org.springframework.boot</groupId>-->
