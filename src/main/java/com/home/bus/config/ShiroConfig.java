@@ -44,7 +44,10 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/img/**", "anon");
         filterChainDefinitionMap.put("/js/**", "anon");
         filterChainDefinitionMap.put("/html/**", "anon");
-        filterChainDefinitionMap.put("/getVerifyCode", "anon"); //给验证码使用
+        //给验证码使用,必须注意发布到tomcat等容器的时候，这个链接是直接指向根"/"，
+        // 如果不小心tomcat没有修改conf/server.xml里的配置，导致需要使用类似于这样：
+        //http://192.168.31.10:8080/bus/login的访问方式，这里将无法获取验证码。
+        filterChainDefinitionMap.put("/getVerifyCode", "anon");
         //配置退出 过滤器,其中的具体的退出代码Shiro已经替我们实现了
         filterChainDefinitionMap.put("/logout", "logout");
         //<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;

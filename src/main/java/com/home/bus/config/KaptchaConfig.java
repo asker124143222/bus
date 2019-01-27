@@ -38,7 +38,7 @@ public class KaptchaConfig {
         // 验证码长度
         properties.setProperty("kaptcha.textproducer.char.length", "4");
         // 字体
-//        properties.setProperty("kaptcha.textproducer.font.names", "宋体,楷体,微软雅黑");
+        properties.setProperty("kaptcha.textproducer.font.names", "Arial");
 
         properties.put("kaptcha.obscurificator.impl","com.google.code.kaptcha.impl.ShadowGimpy");
 
