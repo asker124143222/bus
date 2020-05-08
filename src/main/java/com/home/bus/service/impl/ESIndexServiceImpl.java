@@ -11,6 +11,7 @@ import org.apache.http.util.EntityUtils;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.client.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @Service
+@ConditionalOnProperty(prefix = "elasticsearch",name = "enable",havingValue = "true")
 public class ESIndexServiceImpl implements ESIndexService {
 
     @Resource

@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -19,8 +20,9 @@ import java.util.Map;
  * @Date: 2018/11/17 23:27
  * @Description:
  */
-//@Configuration
-//@EnableKafka
+@Configuration
+@EnableKafka
+@ConditionalOnProperty(prefix = "spring.mqconfig", name = "mq-enable" ,havingValue = "true")
 public class KafkaProducerConfig {
     @Value("${spring.kafka.producer.bootstrap-servers}")
     private String bootstrapServer;

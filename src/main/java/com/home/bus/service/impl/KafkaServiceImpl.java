@@ -7,6 +7,7 @@ import com.home.bus.service.MQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
  * @Description:
  */
 @Service
+@ConditionalOnProperty(prefix = "spring.mqconfig", name = "mq-enable" ,havingValue = "true")
 public class KafkaServiceImpl implements MQService {
 
     @Resource
@@ -38,5 +40,4 @@ public class KafkaServiceImpl implements MQService {
         long end = System.currentTimeMillis();
         logger.info("写入kafka，耗时："+(end-start)+"毫秒");
     }
-
 }

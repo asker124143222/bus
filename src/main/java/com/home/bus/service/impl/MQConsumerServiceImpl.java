@@ -6,6 +6,7 @@ import com.home.bus.entity.mq.MQMessage;
 import com.home.bus.service.MQConsumerService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
  * @Description:
  */
 @Service
+@ConditionalOnProperty(prefix = "spring.mqconfig", name = "mq-enable" ,havingValue = "true")
 public class MQConsumerServiceImpl implements MQConsumerService {
     private ObjectMapper objectMapper;
     private List<MQMessage> mqMessageList;
@@ -35,8 +37,7 @@ public class MQConsumerServiceImpl implements MQConsumerService {
         return mqMessageList;
     }
 
-    //暂时注销
-//    @KafkaListener(topics = "${spring.kafka.topic.Name:null}")
+    @KafkaListener(topics = "${spring.kafka.topic.Name:null}")
     private void consumer(ConsumerRecord<?, ?> record)
     {
         if(mqMessageList==null) mqMessageList = new ArrayList<>();

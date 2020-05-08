@@ -2,6 +2,7 @@ package com.home.bus.controller;
 
 import com.home.bus.entity.esIndex.ESCustomer;
 import com.home.bus.service.ESCustomerService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import java.util.Map;
  */
 
 @Controller
+@ConditionalOnProperty(prefix = "elasticsearch",name = "enable",havingValue = "true")
 @RequestMapping("/esCustomer")
 public class ESCustomerController {
     @Resource

@@ -5,14 +5,14 @@ server:
 
 spring:
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://192.168.31.10:3306/busdata?useUnicode=true&characterEncoding=UTF-8
-    username: bus
-    password: 123@abc.com
-#    driver-class-name: com.mysql.jdbc.Driver
-#    url: jdbc:mysql://192.168.31.10:3306/busData?characterEncoding=utf8&useSSL=false
-#    username: root
-#    password: root
+#    driver-class-name: org.mariadb.jdbc.Driver
+#    url: jdbc:mariadb://192.168.31.10:3306/busdata?useUnicode=true&characterEncoding=UTF-8
+#    username: bus
+#    password: 123@abc.com
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/busData?characterEncoding=utf8&useSSL=false
+    username: root
+    password: root
   jpa:
     hibernate:
       ddl-auto: update
@@ -50,18 +50,18 @@ spring:
     database: 0
 
   mqconfig:
-    mq-enable: false #是否启用消息中间件
+    mq-enable: true #是否启用消息中间件
 
-  #kafka:
+  kafka:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      bootstrap-servers: 192.168.31.10:9092,192.168.31.10:9093,192.168.31.10:9094
-    bootstrap-servers: 192.168.31.10:9092,192.168.31.10:9093,192.168.31.10:9094
+      bootstrap-servers: 192.168.44.10:9092  #,192.168.44.10:9093,192.168.44.10:9094
+    bootstrap-servers: 192.168.44.10:9092   #,192.168.44.10:9093,192.168.44.10:9094
     topic:
       Name: home.bus.log2 #自定义topic名称
-      numPartitions: 2  #自定义分区
-      replicationFactor: 2 #自定义副本
+      numPartitions: 1  #自定义分区
+      replicationFactor: 1 #自定义副本
     consumer:
       group-id: home.bus.log.group.1
       auto-offset-reset: latest
@@ -71,6 +71,7 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 elasticsearch:
+  enable: false
   ip: 192.168.31.10:9200
 
 
